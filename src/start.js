@@ -1,13 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
+import Welcome from "./welcome";
+// is Register imported thru Welcome?
+import Logo from "./logo";
 
-ReactDOM.render(
-    <HelloWorld />,
-    document.querySelector('main')
-);
+// add all the components that should end up in the bundle
 
-function HelloWorld() {
-    return (
-        <div>Hello, World!</div>
-    );
+// we only call ReactDOM render once in your whole project
+
+if (location.pathname == "/welcome") {
+    var elem = <Welcome />;
+} else {
+    var logo = <Logo />;
 }
+
+// render the wrapper
+ReactDOM.render(elem, logo, document.querySelector("main"));
+
+// property document.cookie (Javascript could read the cookie/ but middleware prevents that)
+
+// is the user logged in or not?
+// if the user is logged out the url is /welcome
