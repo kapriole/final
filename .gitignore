@@ -1,5 +1,6 @@
 node_modules
 .DS_Store
+secrets
 secrets.json
 .vscode
 NOTES.txt

@@ -1,50 +1,26 @@
 /// WELCOME PAGE /////
 
 import React from "react";
-import axios from "axios";
 import Registration from "./register";
-import "./styles/app.css";
+import Login from "./login";
+import Reset from "./reset";
+  
 
-// import
+import { HashRouter, Route } from "react-router-dom";
+import "./styles/app.css";
+// import styles
 
 export default class Welcome extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            greeting: "Welcome to Addventure App"
-        };
-        // this.handleClick = this.handleClick.bind(this);
-        // OR YOU can bind directly in the method
-    }
-
-    // its like vue mounted
-    componentDidMount() {
-        axios
-            .get("/")
-            .then(res => res.json(console.log("axios get / happend")))
-            .then(greeting => this.setState({ greeting }));
-        // what else comes in here?
-    }
-
-    windowLoad() {
-        //axios.post / axios request
-        this.setState({
-            last: "vegetaaaaaaaaaa"
-        });
-    }
-
-    // don't forget to bind!!
-
     redner() {
         return (
-            <div className="Welcome">
-                <background-img
-                    src="./public/images/clouds.png"
-                    alt="background"
-                />
-                <img className="welcome-logo" src="./public/images/logo.png" />
-                <Registration />
-            </div>
+            <HashRouter>
+                <h1>Welcome!</h1>
+                <Route exact path="/" component={Registration}></Route>
+                <Route path="/login" component={Login}></Route>
+                <Route path="/reset" component={Reset}></Route>;
+            </HashRouter>
         );
     }
 }
+
+// have to update the reset part 

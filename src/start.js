@@ -11,11 +11,11 @@ import Logo from "./logo";
 if (location.pathname == "/welcome") {
     var elem = <Welcome />;
 } else {
-    var logo = <Logo />;
+    <Logo />;
 }
 
 // render the wrapper
-ReactDOM.render(elem, logo, document.querySelector("main"));
+ReactDOM.render(elem, document.querySelector("main"));
 
 // property document.cookie (Javascript could read the cookie/ but middleware prevents that)
 
