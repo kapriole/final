@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Welcome from "./welcome";
 // is Register imported thru Welcome?
-import Logo from "./logo";
+import App from "./app";
 
 // add all the components that should end up in the bundle
 
@@ -11,7 +11,7 @@ import Logo from "./logo";
 if (location.pathname == "/welcome") {
     var elem = <Welcome />;
 } else {
-    <Logo />;
+    elem = <App />;
 }
 
 // render the wrapper

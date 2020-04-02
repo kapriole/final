@@ -15,6 +15,7 @@ export default class Welcome extends React.Component {
         return (
             <HashRouter>
                 <h1>Welcome!</h1>
+                <img src="/public.logo.pgn" alt="logo" />
                 <Route exact path="/" component={Registration}></Route>
                 <Route path="/login" component={Login}></Route>
                 <Route path="/reset" component={Reset}></Route>;

@@ -1,11 +1,11 @@
 import React from "react";
-import instance from "./axios"; // is this right?
+import axios from "./axios"; // is this right?
+import { Link } from "react-router-dom";
 
 /// any place to link
 
-import { Link } from "react-router-dom"; // is this right?
-
-class Reset extends React.Component {
+export default class Reset extends React.Component {
+    // I get a weird error message around here
     constructor(props) {
         super(props);
         // from here you can use this.props
@@ -16,7 +16,7 @@ class Reset extends React.Component {
     /// make various posts
 
     submit() {
-        instance
+        axios
             .post("/reset", {
                 email: this.state.email   
             })
@@ -30,6 +30,7 @@ class Reset extends React.Component {
                 }
             });
     }
+
     handlechange({ target }) {
         this.setState({
             [target.name]: target.value
@@ -45,6 +46,7 @@ class Reset extends React.Component {
         // how to get the step ( with the right name )
         // step one: user is on page
         // is the responnse from the server if the mailadress exists
+        // setState to the steps that should be rendered ...
         if (step == "something") {
             return (
                 <div>
@@ -65,35 +67,40 @@ class Reset extends React.Component {
         } // step two: user clicks reset button
         // step three: user clicks send reset code
         else if (step == "something else") {
-return (
-    <div>
-        {this.state.error && (
-            <div className="error">
-                SORRY SOMETHING WENT WRONG! TRY AGAIN
-                <Link to="/reset">RESET</Link>
-            </div>
-        )}
-        <h1>PLS ENTER UR CODE AND NEW PASSWORD</h1>
-        <p>
-            Please enter the code you've received via email you used for
-            registration{" "}
-        </p>
-        <input name="code" onChange={e => this.handleChange(e)} />
-        <input name="new_pass" onChange={e => this.handleChange(e)} />
-        <button onClick={() => this.submit()}>submit</button>
-    </div>
-);        } else {
-return (
-    <div>
-        {this.state.error && (
-            <div className="error">
-                SORRY SOMETHING WENT WRONG! TRY AGAIN
-                <Link to="/reset">RESET</Link>
-            </div>
-        )}
-        <h1>YEEEEEEEEAAAAAHHHHH</h1>
-    </div>
-);        }
+            return (
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHING WENT WRONG! TRY AGAIN
+                            <Link to="/reset">RESET</Link>
+                        </div>
+                    )}
+                    <h1>PLS ENTER UR CODE AND NEW PASSWORD</h1>
+                    <p>
+                        Please enter the code you&aposve received via email you used
+                        for registration{" "}
+                    </p>
+                    <input name="code" onChange={e => this.handleChange(e)} />
+                    <input
+                        name="new_pass"
+                        onChange={e => this.handleChange(e)}
+                    />
+                    <button onClick={() => this.submit()}>submit</button>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHING WENT WRONG! TRY AGAIN
+                            <Link to="/reset">RESET</Link>
+                        </div>
+                    )}
+                    <h1>YEEEEEEEEAAAAAHHHHH</h1>
+                </div>
+            );
+        }
     }
     render() {
         return <div>{this.getCurrentDisplay()}</div>;

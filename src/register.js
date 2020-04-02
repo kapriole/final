@@ -1,5 +1,5 @@
 import React from "react";
-import instance from "./axios";
+import axios from "./axios";
 
 /// any place to link
 
@@ -17,7 +17,7 @@ export default class Registration extends React.Component {
         this.state = {};
     }
     submit() {
-        instance
+        axios
             .post("/register", {
                 first: this.state.first,
                 last: this.state.last,
