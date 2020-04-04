@@ -7,3 +7,4 @@ var instance = axios.create({
 });
 
 export default instance;
+

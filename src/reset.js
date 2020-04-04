@@ -10,19 +10,24 @@ export default class Reset extends React.Component {
         super(props);
         // from here you can use this.props
         // react checks for changing states
-        this.state = {};
+        this.state = {
+            step: "resetform"
+        };
     }
 
     /// make various posts
 
     submit() {
         axios
-            .post("/reset", {
-                email: this.state.email   
+            .post("/reset/password/start", {
+                email: this.state.email
             })
             .then(({ data }) => {
                 if (data.success) {
                     // redirect to the page that shows the input field for the password
+                    this.setState({
+                        step: "codenewpw"
+                    });
                 } else {
                     this.setState({
                         error: true
@@ -31,77 +36,98 @@ export default class Reset extends React.Component {
             });
     }
 
+
+    checkCode() {
+        axios
+            .post("/reset/password/code", {
+                email: this.state.email,
+                code: this.state.code,
+                newpassword: this.state.newpass
+            })
+            .then(({ data }) => {
+                if (data.success) {
+                    // redirect to the page that shows the input field for the password
+                    this.setState({
+                        step: "yeah"
+                    });
+                } else {
+                    this.setState({
+                        error: true
+                    });
+                }
+            });
+            
+    }
+
+    getCurrentDisplay() {
+        const step = this.state.step;
+        if (step == "resetform") {
+            return (
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHING WENT WRONG! TRY AGAIN
+                            <a to="/reset/password/start">RESET</a>
+                        </div>
+                    )}
+                    <h2>RESET PASSWORD</h2>
+                    <p>
+                        Please enter the email address with which you registered
+                    </p><br></br>
+                    Your Email<br></br>
+                    <input name="email" onChange={e => this.handleChange(e)} />
+                    <br></br>
+                    <br></br>
+                    <button onClick={() => this.submit()}>submit</button>
+                </div>
+            );
+        } // step two: user clicks reset button
+        // step three: user clicks send reset code
+        else if (step == "codenewpw") {
+            return (
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHING WENT WRONG! TRY AGAIN
+                            <a to="/reset/password/code">RESET</a>
+                        </div>
+                    )}
+                    <h2>PLS ENTER UR CODE AND NEW PASSWORD</h2>
+                    <p>
+                        Please enter the code you&aposve received via email you
+                        used for registration
+                    </p>
+                    <input name="code" onChange={e => this.handleChange(e)} />
+                    <input
+                        name="newpass"
+                        type="pass"
+                        onChange={e => this.handleChange(e)}
+                    />
+                    <button onClick={() => this.submit()}>submit</button>
+                </div>
+            );
+        } else if (step =="yeah") {
+            return (
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHING WENT WRONG! TRY AGAIN
+                            <a to="/reset/password/start">RESET</a>
+                        </div>
+                    )}
+                    <h2>YEEEEEEEEAAAAAHHHHH</h2>
+                </div>
+            );
+        }
+        else { console.log("something gone wrong somewhere");}
+    }
+    
     handlechange({ target }) {
         this.setState({
             [target.name]: target.value
         });
     }
 
-    // use the class to to call the method on each new screen 
-    // split it  into 3 methods and then var result = new Result 
-    // result.firstScreen, result.secondScreen, ...
-
-    getCurrentDisplay() {
-        const step = this.state.step;
-        // how to get the step ( with the right name )
-        // step one: user is on page
-        // is the responnse from the server if the mailadress exists
-        // setState to the steps that should be rendered ...
-        if (step == "something") {
-            return (
-                <div>
-                    {this.state.error && (
-                        <div className="error">
-                            SORRY SOMETHING WENT WRONG! TRY AGAIN
-                            <Link to="/reset">RESET</Link>
-                        </div>
-                    )}
-                    <h1>RESET PASSWORD</h1>
-                    <p>
-                        Please enter the email address with which you registered
-                    </p>
-                    <input name="email" onChange={e => this.handleChange(e)} />
-                    <button onClick={() => this.submit()}>submit</button>
-                </div>
-            );
-        } // step two: user clicks reset button
-        // step three: user clicks send reset code
-        else if (step == "something else") {
-            return (
-                <div>
-                    {this.state.error && (
-                        <div className="error">
-                            SORRY SOMETHING WENT WRONG! TRY AGAIN
-                            <Link to="/reset">RESET</Link>
-                        </div>
-                    )}
-                    <h1>PLS ENTER UR CODE AND NEW PASSWORD</h1>
-                    <p>
-                        Please enter the code you&aposve received via email you used
-                        for registration{" "}
-                    </p>
-                    <input name="code" onChange={e => this.handleChange(e)} />
-                    <input
-                        name="new_pass"
-                        onChange={e => this.handleChange(e)}
-                    />
-                    <button onClick={() => this.submit()}>submit</button>
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    {this.state.error && (
-                        <div className="error">
-                            SORRY SOMETHING WENT WRONG! TRY AGAIN
-                            <Link to="/reset">RESET</Link>
-                        </div>
-                    )}
-                    <h1>YEEEEEEEEAAAAAHHHHH</h1>
-                </div>
-            );
-        }
-    }
     render() {
         return <div>{this.getCurrentDisplay()}</div>;
     }

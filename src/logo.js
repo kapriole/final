@@ -10,11 +10,11 @@ export default class App extends React.Component {
         super();
         this.state = {}
    }
-    redner() {
+    render() {
         return (
             <div>
                 <h1>Hello from app</h1>
-                <img img-src="./public/images/logo.png" />
+                <img src="./images/logo.png" />
                 <background-img
                     src="./public/images/clouds.png"
                     alt="background"

@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import Welcome from "./welcome";
 // is Register imported thru Welcome?
 import App from "./app";
-
 // add all the components that should end up in the bundle
 
 // we only call ReactDOM render once in your whole project

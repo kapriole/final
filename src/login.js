@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "./axios"; // is this right?
+import { HashRouter, Route } from "react-router-dom";
 
 /// any place to link
 
@@ -22,7 +23,7 @@ export default class Registration extends React.Component {
             .then(({ data }) => {
                 if (data.success) {
                     // redirect to a page that is not welcome
-                    location.replace("/login/welcome");
+                    location.replace("/login/welcome"); // user? 
                     // show a page for logged in users with the link to the reset password
 
                 } else {
@@ -39,22 +40,30 @@ export default class Registration extends React.Component {
     }
     render() {
         return (
-            <div>
-                {this.state.error && (
-                    <div className="error">
-                        SORRY SOMETHINGS WRONG! TRY AGAIN
-                        <Link to="/login">Log in</Link>
-                    </div>
-                )}
-                <input name="email" onChange={e => this.handleChange(e)} />
-                <input name="pass" onChange={e => this.handleChange(e)} />
-                <button onClick={() => this.submit()}>login</button>
-                <p>
-                    If you are not yet a User <a href="">REGISTER!</a>
-                    <Link to="/register">Log in</Link><br></br>
-                    <Link to="/reset">Reset Password</Link>
-                </p>
-            </div>
+            <HashRouter>
+                <div>
+                    {this.state.error && (
+                        <div className="error">
+                            SORRY SOMETHINGS WRONG! TRY AGAIN
+                            <Link to="/login">Log in</Link>
+                        </div>
+                    )}
+                    Email<br></br>
+                    <input name="email" onChange={e => this.handleChange(e)} />
+                    <br></br>
+                    Password<br></br>
+                    <input name="pass" onChange={e => this.handleChange(e)} />
+                    <br></br>
+                    <br></br>
+                    <button onClick={() => this.submit()}>login</button>
+                    <p>
+                        If you are not yet a User<br></br>
+                        <Link to="/register"> Register</Link>
+                        <br></br>or if u are one<br></br>
+                        <Link to="/reset/password/start">Reset Password</Link>
+                    </p>
+                </div>
+            </HashRouter>
         );
     }
 }

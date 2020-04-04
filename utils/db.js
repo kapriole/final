@@ -8,15 +8,16 @@ const db = spicedPg(
 // you could make a secret json file to store your creds
 // here refer to petiition db
 
+
 //// REGISTRATION
 
-module.exports.addUser = (first, last, mail, password) => {
+module.exports.addUser = (first, last, mail, element, password, bio, imgUrl) => {
     const q = `
-        INSERT INTO users (first, last, email, pass)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO users (first, last, email, class, pass, bio, img_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
     `;
-    const params = [first, last, mail, password]; // do I have to use the hashedPW?
+    const params = [first, last, mail, element, password, bio, imgUrl]; // do I have to use the hashedPW?
     return db.query(q, params);
 };
 
@@ -28,7 +29,7 @@ module.exports.getUser = mail => {
     users.id
     users.first,
     users.last,
-    users.mail,
+    users.email,
     users.password,
     FROM users
     RETURNING *
@@ -37,15 +38,26 @@ module.exports.getUser = mail => {
     return db.query(q, params);
 };
 
+// getUserById
+
+module.exports.getUserInfoById = userId => {
+    const q = `
+        SELECT * FROM users
+        WHERE id = $1
+    `;
+    const params = [userId];
+    return db.query(q, params);
+};
+
 // updateUserCode
 
-module.exports.updateUserCode = (secrectUserCode, mail) => {
+module.exports.updateUserCode = (secretCode, mail) => {
     const q = `
     INSERT code INTO passcodes 
-    WHERE user.mail = $1
+    WHERE users.email = $2
     RETURNING *
     `;
-    const params = [secrectUserCode, mail];
+    const params = [secretCode, mail];
     return db.query(q, params);
 };
 
@@ -54,15 +66,25 @@ module.exports.updateUserCode = (secrectUserCode, mail) => {
 module.exports.getUserCode = (mail) => {
     const q = `
     SELECT code FROM passcodes 
-    WHERE user.mail = $1
+    WHERE users.email = $1
     RETURNING *
     `;
     const params = [mail];
     return db.query(q, params);
 };
 
-
 //// UPDATE hashedpassword 
+
+module.exports.updatePassword = (mail, newHashedPW) => {
+    const q = `
+        INSERT into users (email, pass)
+        VALUES ($1, $2)
+        DO UPDATE SET pass = $2
+        RETURNING *
+    `;
+    const params = [mail, newHashedPW]; // do I have to use the hashedPW?
+    return db.query(q, params);
+};
 
 
 /// add the code
@@ -95,15 +117,15 @@ module.exports.getImageWithId = imageId => {
 
 //// Update Profile
 
-module.exports.updateProfile = (userId, age, city, url) => {
+module.exports.updateProfile = (userId, first, last, element, email, imgUrl, bio) => {
     const q = `
-        INSERT into user_profiles (user_id, age, city, url)
-        VALUES ($1, $2, $3, $4)
+        INSERT into user_profiles (user_id, first, last, class, email, img_url, bio)
+        VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (user_id)
-        DO UPDATE SET age = $2, city = $3, url = $4
+        DO UPDATE SET first = $2, last = $3, email = $4, img_url = $5, bio = $6
         RETURNING *
     `;
-    const params = [userId, age, city, url]; // do I have to use the hashedPW?
+    const params = [userId, first, last, element, email, imgUrl, bio]; // do I have to use the hashedPW?
     return db.query(q, params);
 };
 
