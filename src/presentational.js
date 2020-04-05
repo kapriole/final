@@ -12,7 +12,7 @@ export default function Presentational({first, last, ImgUrl}) {
         <React.Fragment>
             <h2>I&aposm the presentaional component</h2>
             <h2>My name is: {first} {last}</h2>
-            <img width="50%" src={imgUrl} alt={first} />
+            <img width="40%" src={imgUrl} alt={first} />
         </React.Fragment>
     );
     

@@ -5,7 +5,6 @@ export default class Uploader extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            uploaderIsVisible: !this.state.uploaderIsVisible
         };
     }
     componentDidMount() {
@@ -14,8 +13,10 @@ export default class Uploader extends React.Component {
     uploadImage() {
         console.log("uploade image in uploader");
         var formData = new FormData();
+        console.log("this file", this.state.file);
 
-        formData.append("file", this.file);
+        formData.append("file", this.state.file);
+        console.log("formData", formData);
 
         axios
             .post("/upload", formData)
@@ -28,26 +29,24 @@ export default class Uploader extends React.Component {
         // and axios.post it and update the DB and get back the current imgURL
         // console.log ( response )
         // when the upload is done, it knows the url of the uploaded file and must pass it to a function that was passed to it as a prop.
-        this.props.myMethod(this.response.imgUrl);
+        this.props.myImgUrl(this.response.imgUrl);
         // console.log();
         // read about parent children react
     }
+
     handleChange({ target }) {
         this.setState({
             [target.name]: target.value
         });
     }
-
-    toggleModal() {
-        this.setState({ uploaderVisible: true });
-    }
+   
     // similar to vue
     render() {
         console.log("this.props: ", this.props);
         return (
             <React.Fragment>
                 <h3>This is the uploader component!!</h3>
-                <input type="file" name="file" accept="image/*" />
+                <input onChange={(e)=>this.handleChange(e)} type="file" name="file" accept="image/*" />
                 <button onClick={() => this.uploadImage()}>
                     Upload New Image!
                 </button>

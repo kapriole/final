@@ -5,21 +5,24 @@ import "./styles/app.css";
 
 // import
 
-export default class App extends React.Component {
-    constructor() {
-        super();
-        this.state = {}
-   }
+export default class Logo extends React.Component {
     render() {
         return (
             <div>
-                <h1>Hello from app</h1>
-                <img src="./images/logo.png" />
-                <background-img
-                    src="./public/images/clouds.png"
-                    alt="background"
+                <img
+                    src="./images/logo.png"
+                    width="20%"
+                    style={{
+                        position: "absolute",
+                        left: "5%",
+                        transform: "translate(-5%, -5%)",
+                        fontFamily: "Impact, Charcoal, sans-serif",
+                        borderStyle: "solid 2px",
+                        borderColor: "cornflowerblue",
+                    }}
                 />
             </div>
         );
     }
 }
+

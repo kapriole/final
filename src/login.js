@@ -23,7 +23,7 @@ export default class Registration extends React.Component {
             .then(({ data }) => {
                 if (data.success) {
                     // redirect to a page that is not welcome
-                    location.replace("/login/welcome"); // user? 
+                    location.replace("/user"); // user? 
                     // show a page for logged in users with the link to the reset password
 
                 } else {

@@ -50,6 +50,7 @@ module.exports.getUserInfoById = userId => {
 };
 
 // updateUserCode
+// INSET NEW CODE
 
 module.exports.updateUserCode = (secretCode, mail) => {
     const q = `
@@ -61,17 +62,23 @@ module.exports.updateUserCode = (secretCode, mail) => {
     return db.query(q, params);
 };
 
-// find the Usercode in the table
+// find the Usercode in the table by Email
+// And less than 10 minutes old
 
 module.exports.getUserCode = (mail) => {
     const q = `
     SELECT code FROM passcodes 
     WHERE users.email = $1
+    WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '10 minutes'
     RETURNING *
     `;
     const params = [mail];
     return db.query(q, params);
 };
+
+/// SELECT * FROM my_table
+/// WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '10 minutes';
+
 
 //// UPDATE hashedpassword 
 
@@ -85,6 +92,8 @@ module.exports.updatePassword = (mail, newHashedPW) => {
     const params = [mail, newHashedPW]; // do I have to use the hashedPW?
     return db.query(q, params);
 };
+
+
 
 
 /// add the code

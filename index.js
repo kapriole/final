@@ -361,7 +361,7 @@ app.post("/reset/password/code", (req, res) => {
 
  
 app.get("/user", (req, res) => {
-    console.log("req.session", req.session);
+    // console.log("req.session", req.session);
     // send the user data names id and the url!
     // console.log!!
     const userId = req.session.userId;
@@ -392,7 +392,7 @@ console.log("config.s3Url", config.s3Url);
 
 app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
     // gives you access to your file
-    console.log("file: ", req.file);
+    console.log("in upolad POST ROUTE ");
     // gives you access to the user input
     console.log("user input: ", req.body);
     console.log("config.s3Url", config.s3Url);
