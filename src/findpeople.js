@@ -50,7 +50,7 @@ function FindPeople() {
                 return (
                     <div>
                         <p key={eachUser}>
-                            {eachUser.first} {eachUser.last}
+                        {eachUser.first} {eachUser.last}
                         </p>
                         <img src={eachUser.imgUrl}></img>
                     </div>
