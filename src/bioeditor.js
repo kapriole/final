@@ -8,10 +8,13 @@ export default class Bioeditor extends React.Component {
         };
         console.log("props!", props);
     }
+
+    // Can't perform a React state update on an unmounted component. get info for bioeditor
     componentDidMount() {
         console.log("bioeditor mounted!!");
     }
-    uploadBio() {
+
+    uploadBio(e) {
         console.log("uploade text for bio");
         var bioText = this.state.bio;
         console.log("this file", this.state.bio);
@@ -19,14 +22,14 @@ export default class Bioeditor extends React.Component {
         axios
             .post("/bio", bioText)
             .then(function(response) {
-                console.log("resp from POST /bioe: ", response);
+                console.log("resp from POST /bioe ", response);
+                this.props.setBio(e);
             })
             .catch(function(err) {
                 console.log("err in POST /bio: ", err);
             });
         // and axios.post it and update the DB and get back the current imgURL
         // console.log ( response )
-        this.props.setBio(this.response.bio);
     }
 
     /// is there already a bio?? chekc if the bio exists before
@@ -38,6 +41,7 @@ export default class Bioeditor extends React.Component {
 
     toggleBioEditor() {
         this.setState({ bioEditorIsVisible: !this.state.bioEditorIsVisible });
+        console.log("this.state", this.state);
         const step = this.state.step;
         if (step == "nobio") {
             return (
@@ -45,7 +49,7 @@ export default class Bioeditor extends React.Component {
                     <button
                         onClick={() => this.setState({ step: "changebio" })}
                     >
-                    Write down my Lifestory
+                    Write down my Lifestory*
                     </button>
                 </div>
             );
@@ -64,7 +68,7 @@ export default class Bioeditor extends React.Component {
                     name="bio"
                     accept="text"
                 />
-                <button onClick={() => this.uploadBio()}>
+                <button onClick={(e) => this.uploadBio(e)}>
                     Upload your New Lifestory!
                 </button>
             </div>;
@@ -82,7 +86,7 @@ export default class Bioeditor extends React.Component {
         return (
             <React.Fragment>
               
-                {this.toggleBioEditor()}
+                {()=>this.toggleBioEditor()}
                
             </React.Fragment>
         );
@@ -95,3 +99,5 @@ export default class Bioeditor extends React.Component {
 
 // Whether or not it is displayed should be determined by a property(called, for example, uploaderIsVisible) of the state of the App component.
 // ProfilePic should be passed a function from App for setting this property to true.
+
+// *for testing it's Add and Edit

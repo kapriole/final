@@ -1,17 +1,14 @@
-/// WELCOME PAGE /////
-
 import React from "react";
-import axios from "./axios"; // this is already the copy // check this out (maybe solves issue with csurf)
+import axios from "./axios"; // this is already the copy 
+import { BrowserRouter, Route } from "react-router-dom";
 import "./styles/app.css";
 import Logo from "./logo";
-import Presentational from "./presentational";
 import Uploader from "./uploader";
 import Profile from "./profile";
 import ProfilePic from "./profilepic";
+import OtherProfile from "./otherprofile";
+import FindPeople from "./findpeople";
 
-
-
-// the state only changes thru the passed props! 
 
 export default class App extends React.Component {
     constructor() {
@@ -20,7 +17,6 @@ export default class App extends React.Component {
         };
     }
     
-    // like mount in vue! console.log(this/self)
     componentDidMount() {
         console.log("my app component has mounted!");
         var self = this;
@@ -28,77 +24,114 @@ export default class App extends React.Component {
             .get("/user")
             .then(function (userdata) {
                 console.log("data", userdata.data);
-                self.setState(userdata.data, console.log("userdata received", userdata));
+                self.setState({
+                    id: userdata.data.userId,
+                    first: userdata.data.first,
+                    last: userdata.data.last,
+                    element: userdata.data.element,
+                    imgUrl: userdata.data.imgUrl, // check the name
+                    bio: userdata.data.bio // get more userdata from the DB!
+                });
             }).catch(function (error) {                                                   
                 console.log("error in axios get user info", error);
             });
-    }  //console.log("data from user", userdata.data);
-    // result has user data in it set the state of the user!
+    }  
 
-    //// pass the props !! to the children 
+    // set the data in the componentDidMount function
+
+    //// pass the props !!
     
-    setBio(e) {
-        console.log("myMeth / imageUpload worked / works!");
+    setBio(newBio) {
+        console.log(" updateBio worked / works!");
         this.setState({
-            bioEditorIsVisible: !this.state.bioEditorIsVisible,
-            bio: e
+            // bioEditorIsVisible: !this.state.bioEditorIsVisible,
+            bio: newBio // is whatever the user typed in
         });
     }
+
     toggleModal() {
         this.setState({ uploaderIsVisible: !this.state.uploaderIsVisible });
     }
+
     // get the current imgUrl // pass imgUrl an argument to give it to the children
-    myImgUrl() {
-        console.log("myMeth / imageUpload worked / works!");
+    myImgUrl(newImgUrl) {
+        console.log(" imageUpload worked / works!");
         this.setState({
+            imgUrl: newImgUrl,
             uploaderIsVisible: !this.state.uploaderIsVisible});
     }
+
     render() {
+        console.log(this.state);
+        console.log("props in app", this.props.first);
+
+        // reorganize the structure
+
+        // make a fixed header
+
+        //check if all the right props/methods are passed to the children! in render
+
         return (
-            <React.Fragment>
+            <BrowserRouter>
                 <div
                     style={{
-                        position: "realtive",
+                        position: "relative",
                         fontFamily: "Impact, Charcoal, sans-serif",
                         color: "cornflowerblue",
                     }}
                 >
                     <Logo />
-                    <h2>Welcome to your Userprofile</h2>
-                    <Presentational
-                        first={this.state.first}
-                        last={this.state.last}
-                        imgUrl={this.state.imgUrl}
-                    />
-                    <h2 onClick={() => this.toggleModal()}>
-                        toggle the uploader
-                    </h2>
-                    {this.state.uploaderIsVisible && (
-                        <Uploader
-                            myImgUrl={() =>
-                                this.setState({
-                                    imgUrl: this.state.imgUrl,
-                                    uploaderVisibility: false
-                                })
-                            }
-                        />
-                    )}
-                    <Profile
-                        id={this.state.id}
-                        first={this.state.first}
-                        last={this.state.last}
-                        imgUrl={this.state.imgUrl}
-                        onClick={this.toggleModal}
-                        bio={this.state.bio}
-                        setBio={(e)=>this.setBio(e)}
-                    />
                     <ProfilePic
                         first={this.state.first}
                         last={this.state.last}
                         imgUrl={this.state.imgUrl}
                     />
+                    <Route
+                        exact
+                        path="/"
+                        render={() => (
+                            <Profile
+                                id={this.state.id}
+                                first={this.state.first}
+                                last={this.state.last}
+                                element={this.state.element}
+                                imgUrl={this.state.imgUrl}
+                                toggleModal={() => this.toggleModal()}
+                                onClick={this.toggleModal}
+                                bio={this.state.bio}
+                                setBio={(newBio) => this.setBio(newBio)}
+                            />
+                        )}
+                    />
+                    {this.state.uploaderIsVisible && (
+                        <Uploader
+                            myImgUrl={(newImgUrl) => this.myImgUrl(newImgUrl)}
+                            toggleModal={() => this.toggleModal()}
+                        />
+                    )}
+                    <Route
+                        path="/user/:id"
+                        render={(props) => (
+                            <OtherProfile
+                                key={props.match.url}
+                                match={props.match}
+                                history={props.history}
+                            />
+                        )}
+                    />
+                    <Route
+                        path="/users"
+                        render={() => (
+                            <FindPeople
+                                id={this.state.id}
+                                first={this.state.first}
+                                last={this.state.last}
+                                imgUrl={this.state.imgUrl}
+                            />
+                        )}
+                    />
                 </div>
-            </React.Fragment>
+            </BrowserRouter>
         );
     }
 }
@@ -109,5 +142,3 @@ export default class App extends React.Component {
 // add no default image to the table
 
 // when someone clicks on the profile pic the uploader appears
-
-// ()=>this.toggleModal() OR do the bind in the props

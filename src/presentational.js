@@ -4,15 +4,15 @@ import React from "react";
 
 // this is the profile pic !!!
 
-export default function Presentational({first, last, ImgUrl}) {
-    console.log("props in pres", first, last, ImgUrl);
-    let imgUrl = imgUrl || "./images/default.png";
+export default function Presentational({first, last, imgUrl}) {
+    console.log("props in pres", first, last, imgUrl);
+    let ImgUrl = imgUrl || "./images/default.png";
    
     return (
         <React.Fragment>
             <h2>I&aposm the presentaional component</h2>
             <h2>My name is: {first} {last}</h2>
-            <img width="40%" src={imgUrl} alt={first} />
+            <img width="20%" src={ImgUrl} alt={first} />
         </React.Fragment>
     );
     
