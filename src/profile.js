@@ -1,37 +1,39 @@
 import React from "react";
-import ProfilePic from "./profilepic";
+import Presentational from "./presentational";
 import Bioeditor from "./bioeditor";
 
-/// any place to link
+/// get the props from app and pass it to Bioeditor
 
-// see it after login !
+export default function Profile({ first, last, element, imgUrl, bio }) {
+    let ImgUrl = imgUrl || "./images/default.png";
+    let alt = `${first} ${last}`;
 
-// function or class?
+    return (
+        <React.Fragment>
+            <h2>
+                Welcome to your User Profile: {first}
+                {last} Element:{element}
+            </h2>
+            <Presentational
+                alt={alt}
+                imgUrl={ImgUrl}
+                first={first}
+                last={last}
+            />
+            <h2 onClick={(e) => this.toggleModal(e)}>toggle the uploader</h2>
 
-export default class Profile extends React.Component {
+            <Bioeditor bio={bio} setBio={(e) => this.setBio(e)} />
+        </React.Fragment>
+    );   
 
-// get the props in here from the app 
-    // function?
-    render() {
-        return (
-            <React.Fragment>
-                <h2>I am the profile component</h2>
-               
-            </React.Fragment>
-        );
-    }
+         
+    
+    
 }
 
 
 /*
 
- <Bioeditor
-                    setBio={() =>
-                        this.setState({
-                            bio: this.state.bio,
-                            bioEditorIsVisible: false,
-                        })
-                    }
-                />
+ 
                 
 */

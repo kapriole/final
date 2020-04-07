@@ -139,6 +139,16 @@ module.exports.updateProfile = (userId, first, last, element, email, imgUrl, bio
 };
 
 
+/// Get the users that where recently registered
+
+module.exports.getRecentUsers = () => {
+    const q = `
+        SELECT * FROM users
+        WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '1000 minutes'
+    `;
+    return db.query(q);
+};
+
 /*
 
 Database queries

@@ -358,7 +358,6 @@ app.post("/reset/password/code", (req, res) => {
 // if so replace the old pass with the new hashed PW
                
 /// upload Profile image
-
  
 app.get("/user", (req, res) => {
     // console.log("req.session", req.session);
@@ -375,7 +374,8 @@ app.get("/user", (req, res) => {
                 first: userdata.first, 
                 last: userdata.last,
                 element: userdata.class,
-                imgUrl: userdata.url
+                imgUrl: userdata.url,
+                bio: userdata.bio
             });
         })
         .catch(err => {
@@ -385,6 +385,55 @@ app.get("/user", (req, res) => {
         });
 });
         
+              
+/// get User by Id
+ 
+app.get("/user/:id.json", (req, res) => {
+    if (req.params.id == req.session.userId) {
+        res.json({ redirect: true });
+    }
+    // console.log("req.session", req.body.id);
+    const userId = req.params.id;
+    db.getUserInfoById(userId)
+        .then(({rows}) => {
+            console.log("result from getUserInfo", {rows});
+            res.json(rows[0] || { redirect: "/"});
+        })
+        .catch(err => {
+            console.log("something wrong in get other user data by id", err);
+            res.json({ success: false });
+        });
+});
+
+
+///// get users
+
+app.get("/users", (req, res) => {
+    // console.log("req.session", req.session);
+    // FIND the users who signed up most recently
+    db.getRecentUsers()
+        .then((result) => {
+            console.log("result from getRecentUsers", result);
+            const userdata = result.rows[0];
+            console.log("userdata", userdata);
+            res.json({
+                userId: userdata.id,
+                first: userdata.first,
+                last: userdata.last,
+                element: userdata.class,
+                imgUrl: userdata.url,
+                bio: userdata.bio,
+                timestamp: userdata.created_at,
+            });
+        })
+        .catch((err) => {
+            console.log("something wrong in get userdata", err);
+            res.json({ success: false });
+        });
+});
+        
+///// search users !!!
+
 
 ///////////// upload Image
 
@@ -394,6 +443,7 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
     // gives you access to your file
     console.log("in upolad POST ROUTE ");
     // gives you access to the user input
+    // use req.params
     console.log("user input: ", req.body);
     console.log("config.s3Url", config.s3Url);
     //If the PUT is successful, your file will be available for the world to see at https://s3.amazonaws.com/:yourBucketName/:filename.
@@ -421,12 +471,10 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
             success: false
         });
     }
-});
-        
-    
+});    
 
 
-//// Bio
+//// Bio when new bio was uploaded
 
 app.post("/bio", (req, res) => {
     console.log(req.body);
