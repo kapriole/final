@@ -10,45 +10,54 @@ export default class Uploader extends React.Component {
     componentDidMount() {
         console.log("uploader mounted!!");
     }
-    uploadImage(e) {
-        e.preventDefault();
+
+    
+    handleChange({ target }) {
+        this.setState({
+            [target.name]: target.files,
+        });
+    }
+   
+    uploadImage() {
         console.log("uploade image in uploader");
         var formData = new FormData();
         // this props! 
-        console.log("this file", this.state.file);
-
-        formData.append("file", this.state.file);
-        console.log("formData", formData);
+        console.log("file[0]", this.state.file[0]);
+        var file = this.state.file[0];
+        formData.append("file", file);
+        console.log("formData[0]", formData);
 
         axios
-            .post("/upload", formData)
-            .then(function(response) {
-                console.log("resp from POST /upload: ", response);
-                let newImgUrl = this.response.imgUrl;
+            .post("/upload", formData )
+            .then(image => {
+                console.log("resp from POST /upload: ", image);
+                console.log("resp in rows from POST /upload: ", image.data.rows[0].img_url);
+
+                let newImgUrl = image.data.rows[0].img_url;
                 this.props.myImgUrl(newImgUrl);
-                // set it inside (access to response)
+                // check the newImgUrl
             })
-            .catch(function(err) {
+            .catch(err => {
                 console.log("err in POST /upload: ", err);
             });
     }
 
-    handleChange({ target }) {
-        this.setState({
-            [target.name]: target.value
-        });
-    }
-   
+    // add the close button! (set visibility to false)
     // similar to vue
     render() {
-        console.log("this.props: ", this.props);
         return (
             <React.Fragment>
                 <h3>This is the uploader component!!</h3>
-                <input onChange={()=>this.handleChange()} type="file" name="file" accept="image/*" />
-                <button onClick={(e) => this.uploadImage(e)}>
+                <input
+                    onChange={(e) => this.handleChange(e)}
+                    type="file"
+                    name="file"
+                    accept="image/*"
+                />
+                <button onClick={() => this.uploadImage()}>
                     Upload New Image!
                 </button>
+               
             </React.Fragment>
         );
     }

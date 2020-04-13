@@ -3,16 +3,24 @@ import Presentational from "./presentational";
 import Bioeditor from "./bioeditor";
 
 /// get the props from app and pass it to Bioeditor
+// can't use this in function / use es6 class
+// change everything to props --> props.first ... / console.log(props)
+// import props with the handleChange method 
+// Link the Bioeditor
 
-export default function Profile({ first, last, element, imgUrl, bio }) {
+// either props --> props.first or {first} 
+// get props
+
+
+export default function Profile({ first, last, element, imgUrl, bio, setBio, toggleModal }) {
     let ImgUrl = imgUrl || "./images/default.png";
     let alt = `${first} ${last}`;
 
     return (
         <React.Fragment>
             <h2>
-                Welcome to your User Profile: {first}
-                {last} Element:{element}
+                Welcome to your userprofile {first}
+                {last} ! <br></br> Element:{element}
             </h2>
             <Presentational
                 alt={alt}
@@ -20,20 +28,10 @@ export default function Profile({ first, last, element, imgUrl, bio }) {
                 first={first}
                 last={last}
             />
-            <h2 onClick={(e) => this.toggleModal(e)}>toggle the uploader</h2>
+            <h2 onClick={toggleModal}>toggle the uploader</h2>
 
-            <Bioeditor bio={bio} setBio={(e) => this.setBio(e)} />
+            <Bioeditor bio={bio} setBio={setBio} />
         </React.Fragment>
     );   
-
-         
-    
     
 }
-
-
-/*
-
- 
-                
-*/

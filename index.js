@@ -357,7 +357,7 @@ app.post("/reset/password/code", (req, res) => {
 
 // if so replace the old pass with the new hashed PW
                
-/// upload Profile image
+/// get USER DATA
  
 app.get("/user", (req, res) => {
     // console.log("req.session", req.session);
@@ -374,7 +374,7 @@ app.get("/user", (req, res) => {
                 first: userdata.first, 
                 last: userdata.last,
                 element: userdata.class,
-                imgUrl: userdata.url,
+                imgUrl: userdata.img_url,
                 bio: userdata.bio
             });
         })
@@ -406,9 +406,9 @@ app.get("/user/:id.json", (req, res) => {
 });
 
 
-///// get users
+///// get recent users
 
-app.get("/users", (req, res) => {
+app.get("/users/recent", (req, res) => {
     // console.log("req.session", req.session);
     // FIND the users who signed up most recently
     db.getRecentUsers()
@@ -432,10 +432,36 @@ app.get("/users", (req, res) => {
         });
 });
         
-///// search users !!!
+////// USER SEARCH
+
+app.get("/users/search/:userId", (req, res) => {
+    console.log("req.session.userId", req.session.userId);
+    // checck the data from the userinput
+    // use params
+    const input = req.body.userInput;
+    db.findUsers(input).then((result) => {
+        // this should return the list of users
+        // console.log("result", result);
+        res.json({ result });
+    }).catch(err => {
+        console.log("error in find Users", err);
+    });
+    
+});
 
 
-///////////// upload Image
+/* 
+EXAMPLE
+
+app.get('/users/:userId/books/:bookId', function (req, res) {
+  // Access userId via: req.params.userId
+  // Access bookId via: req.params.bookId
+  res.send(req.params);
+})
+*/
+
+
+///////////// UPLOAD Image
 
 console.log("config.s3Url", config.s3Url);
 
@@ -444,7 +470,7 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
     console.log("in upolad POST ROUTE ");
     // gives you access to the user input
     // use req.params
-    console.log("user input: ", req.body);
+    console.log("user input: ", req.file);
     console.log("config.s3Url", config.s3Url);
     //If the PUT is successful, your file will be available for the world to see at https://s3.amazonaws.com/:yourBucketName/:filename.
 
@@ -452,20 +478,16 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
         // user input = req.body
         // add Photos takes: url, username, title, description
         let imgUrl = config.s3Url + req.file.filename; // + the adress to the amazon webspace // https://s3.amazonaws.com/spicedling/ // or my bucket name
-        let userId = req.body.id;
+        let userId = req.session.userId;
 
-        db.addProfileImg(imgUrl, userId) // like add Photos!
+        db.addProfileImg(userId, imgUrl) // like add Photos!
             .then(image => {
                 res.json(image);
                 console.log("image succesfully uploaded");
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log("error in add photos in /upload", err);
             });
-        // with every upload the table is updated
-        res.json({
-            success: true
-        });
     } else {
         res.json({
             success: false
@@ -473,15 +495,100 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
     }
 });    
 
-
 //// Bio when new bio was uploaded
 
 app.post("/bio", (req, res) => {
-    console.log(req.body);
-    // get everything from the Db andd post it back to the front
-    res.json("send something");
+    console.log("BIO req.session.userId", req.session.userId);
+    console.log("BIO req.bodynewBio", req.body.newBio);
+    const userId = req.session.userId;
+    const bio = req.body.newBio;
+    db.updateBio(userId, bio).then(data => {
+        let newBio = data.rows[0].bio;
+        res.json({ newBio });
+    }).catch(err => { console.log("error", err);});
 });
 
+///// FRIENDS BUTTON
+
+/// initial status of the friendship has to be checked all the time
+
+app.get("/initial-friendship-status/:otherUserId", (req, res) => {
+    // I got back the other users id
+    // console.log("req.session", req.session);
+    // I can already check this in the front
+    const userId = req.session.userId;
+    const otherUserId = req.body.otherUserId; // or params? from the url
+    // not necessary bc I cant be the other user
+    db.checkFriendship(userId, otherUserId).then(result => {
+        console.log("data", result);
+        if (result.rows.length == 0) {
+            console.log("no friendship exists");
+            res.json({ friendship: "no friendship" });
+        } else if (result.rows[0].accepted == false) {
+            console.log("friendship is pending / who is who?");
+            if (result.rows[0].accepted == result.rows.userId) // check it 
+            {
+                console.log("the friendship wasnt accepted yet");
+                res.json({ friendship: "cancel friendship request" });
+            }
+            else { res.json({ friendship: "accept friendship" }); }
+        } else {
+            res.json({ friendship: "end friendship" });
+        }
+    }).catch(err => { console.log("error in checking the friendship status!", err);});
+});
+
+// 1. if 2 users have no row  they have no friendship
+// 2. if 2 users have a row & accepted row is true ! they have a friendship
+// 3. if they have a row they have some relationship
+
+
+///// the user clicks the Make Friend Request 
+
+app.post("/make-friend-request/:otherUserId", (req, res) => {
+    const userId = req.session.userId;
+    const otherUserId = req.body.otherUserId; // or params? 
+    db.makeFriendshipRequest(userId, otherUserId)
+        .then((data) => {
+            console.log("data", data);
+            res.json({ data: "friendship pending" });
+        })
+        .catch((err) => {
+            console.log("error in making the friendship request!", err);
+        });
+});
+
+// this route runs when the user clicks the Accept Friend Request button
+
+app.post("/add-friendship/:otherUserId", (req, res) => {
+    // db Updates the column accepted to true
+    const userId = req.session.userId;
+    const otherUserId = req.body.otherUserId; // or params?
+    db.acceptFriendship(userId, otherUserId)
+        .then((data) => {
+            console.log("data", data);
+            res.json({ data: "friendship accepted" });
+        })
+        .catch((err) => {
+            console.log("error in accepting the friendship!", err);
+        });
+});
+
+// End Friendship button AND the Cancel Friend Request button
+
+app.post("/end-friendship/:otherUserId", (req, res) => {
+    // db Updates the column accepted to true
+    const userId = req.session.userId;
+    const otherUserId = req.body.otherUserId; // or params?
+    db.deleteFriendship(userId, otherUserId)
+        .then((data) => {
+            console.log("data", data);
+            res.json({ data: "friendship accepted" });
+        })
+        .catch((err) => {
+            console.log("error in deleting the friendship!", err);
+        });
+});
 
 
 //// STAR ROUTE has to stay the last route

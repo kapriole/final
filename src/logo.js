@@ -13,7 +13,7 @@ export default class Logo extends React.Component {
                     src="./images/logo.png"
                     width="20%"
                     style={{
-                        position: "absolute",
+                        position: "relative",
                         left: "5%",
                         transform: "translate(-5%, -5%)",
                         fontFamily: "Impact, Charcoal, sans-serif",

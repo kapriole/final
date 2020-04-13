@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS passcodes;
 
     CREATE TABLE passcodes(
           id SERIAL PRIMARY KEY,

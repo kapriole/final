@@ -5,10 +5,6 @@ const db = spicedPg(
         "postgres:postgres:postgres@localhost:5432/socialnetwork"
 );
 
-// you could make a secret json file to store your creds
-// here refer to petiition db
-
-
 //// REGISTRATION
 
 module.exports.addUser = (first, last, mail, element, password, bio, imgUrl) => {
@@ -38,7 +34,7 @@ module.exports.getUser = mail => {
     return db.query(q, params);
 };
 
-// getUserById
+// getUserInfoById
 
 module.exports.getUserInfoById = userId => {
     const q = `
@@ -50,7 +46,7 @@ module.exports.getUserInfoById = userId => {
 };
 
 // updateUserCode
-// INSET NEW CODE
+// INSERT NEW CODE
 
 module.exports.updateUserCode = (secretCode, mail) => {
     const q = `
@@ -102,13 +98,14 @@ module.exports.updatePassword = (mail, newHashedPW) => {
 
 //// Upload Images
 
-module.exports.addProfileImg = (url, userId) => {
+module.exports.addProfileImg = (userId, imgUrl) => {
     const q = `
-    INSERT url INTO users
-    WHERE user_id = $1
-    RETURNING *
+    UPDATE users 
+    SET img_url=$2
+    WHERE id=$1
+    RETURNING img_url
     `;
-    const params = [url, userId]; // no username
+    const params = [userId, imgUrl]; // no username
     return db.query(q, params);
 };
 
@@ -122,19 +119,16 @@ module.exports.getImageWithId = imageId => {
     return db.query(q, params);
 };
 
-
-
 //// Update Profile
 
-module.exports.updateProfile = (userId, first, last, element, email, imgUrl, bio) => {
+module.exports.updateBio = (userId, bio) => {
     const q = `
-        INSERT into user_profiles (user_id, first, last, class, email, img_url, bio)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (user_id)
-        DO UPDATE SET first = $2, last = $3, email = $4, img_url = $5, bio = $6
+        UPDATE users
+        SET bio=$2
+        WHERE id=$1
         RETURNING *
     `;
-    const params = [userId, first, last, element, email, imgUrl, bio]; // do I have to use the hashedPW?
+    const params = [userId, bio]; // do I have to use the hashedPW?
     return db.query(q, params);
 };
 
@@ -145,19 +139,61 @@ module.exports.getRecentUsers = () => {
     const q = `
         SELECT * FROM users
         WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '1000 minutes'
+        LIMIT 3
     `;
     return db.query(q);
 };
 
-/*
+module.exports.findUsers = (input) => {
+    return db.query(`
+    SELECT first FROM users WHERE first ILIKE $1`, 
+    [input + '%']);
+};
 
-Database queries
+// SELECT FIRST OR LAST NAME OR BOTH?
 
-    SELECT to find a user by email (you can reuse the one you used in Login)
-        we need this query to find out if the email the user entered is valid (ie the user has an account on our site)
-    INSERT into new table for secret codes
-    SELECT that finds the code in the new table that matches the email address and is less than 10 minutes old
-    UPDATE password of user's table by email address
-    not a query - but we'll also need bcrypt's hash method to hash the password we get from the user
+// FRIENDSHIPS
 
-*/
+module.exports.checkFriendship = (userId, otherUserId) => {
+    const q = `
+        SELECT * FROM friendships 
+        WHERE (receiver_id = $1 AND sender_id = $2)
+        OR (receiver_id = $2 AND sender_id = $1)
+    `;
+    const params = [userId, otherUserId];
+    return db.query(q, params);
+};
+
+
+module.exports.makeFriendshipRequest = (userId, otherUserId) => {
+    const q = `
+        INSERT INTO friendships 
+        WHERE (receiver_id = $1 AND sender_id = $2)
+        OR (receiver_id = $2 AND sender_id = $1)
+    `;
+    const params = [userId, otherUserId];
+    return db.query(q, params);
+};
+
+
+module.exports.acceptFriendship = (userId, otherUserId) => {
+    const q = `
+        UPDATE friendships 
+        SET accepted=true
+        WHERE receiver_id = $1 AND sender_id = $2
+    `;
+    const params = [userId, otherUserId];
+    return db.query(q, params);
+};
+
+// check if this works
+
+module.exports.deleteFriendship = (userId, otherUserId) => {
+    const q = `
+    DELETE FROM friendships
+    WHERE (receiver_id = $1 AND sender_id = $2)
+    OR (receiver_id = $2 AND sender_id = $1)
+    `;
+    const params = [userId, otherUserId];
+    return db.query(q, params);
+};
