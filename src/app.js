@@ -62,6 +62,15 @@ export default class App extends React.Component {
     }
 
     render() {
+        console.log(this.state);
+        console.log("props in app", this.props.first);
+
+        // reorganize the structure
+
+        // make a fixed header
+
+        //check if all the right props/methods are passed to the children! in render
+
         return (
             <React.Fragment>
             <BrowserRouter>

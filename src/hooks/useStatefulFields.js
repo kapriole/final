@@ -9,7 +9,11 @@ export default function useStatefulFields() {
         setValues({ ...values, [e.target.name]: e.target.value });
     };
 
+<<<<<<< HEAD
     return [values, handleChange];
+=======
+    return [values, handleChange]
+>>>>>>> 5eb1d03f501cbe344bdb6b7129136ee89b7dd5a7
 
 }
 

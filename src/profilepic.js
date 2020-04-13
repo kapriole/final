@@ -21,7 +21,7 @@ export default function ProfilePic({ first, last, imgUrl }) {
                         position: "absolute",
                         maxWidth: "150px",
                         left: "95%",
-                        top: "5%",
+                        top: "1%",
                         transform: "translate(-90%, -5%)",
                         fontFamily: "Impact, Charcoal, sans-serif",
                         borderStyle: "solid 2px",
