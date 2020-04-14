@@ -16,10 +16,9 @@ export default function ProfilePic({ first, last, imgUrl }) {
                     onChange={(e) => this.handleChange(e)}
                     src={ImgUrl}
                     alt = {alt}
-                    width="6%"
                     style={{
                         position: "absolute",
-                        maxWidth: "150px",
+                        maxWidth: "50px",
                         left: "95%",
                         top: "1%",
                         transform: "translate(-90%, -5%)",

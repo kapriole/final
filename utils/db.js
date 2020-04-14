@@ -197,3 +197,18 @@ module.exports.deleteFriendship = (userId, otherUserId) => {
     const params = [userId, otherUserId];
     return db.query(q, params);
 };
+
+// wannabes and friendslist
+
+module.exports.getFriendsList = (userId) => {
+    const q = `
+    SELECT users.id, first, last, image, accepted
+    FROM friendships
+    JOIN users
+    ON (accepted = false AND recipient_id = $1 AND requester_id = users.id)
+    OR (accepted = true AND recipient_id = $1 AND requester_id = users.id)
+    OR (accepted = true AND requester_id = $1 AND recipient_id = users.id)
+    `;
+    const params = [userId];
+    return db.query(q, params);
+};

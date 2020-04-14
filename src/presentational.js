@@ -11,8 +11,14 @@ export default function Presentational({first, last, imgUrl}) {
     return (
         <React.Fragment>
             <h2>I&aposm the presentaional component</h2>
-            <h2>My name is: {first} {last}</h2>
-            <img width="40%" src={ImgUrl} alt={first} />
+            <h2>
+                My name is: {first} {last}
+            </h2>
+            <img
+                style={{ maxWidth: "150px" }}
+                src={ImgUrl}
+                alt={first}
+            />
         </React.Fragment>
     );
     

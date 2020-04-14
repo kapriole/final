@@ -1,22 +1,32 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Welcome from "./welcome";
-// is Register imported thru Welcome?
 import App from "./app";
-// add all the components that should end up in the bundle
 
-// we only call ReactDOM render once in your whole project
+// redux
+
+import { Provider } from "react-redux";
+import { createStore, applyMiddleware } from "redux";
+import reduxPromise from "redux-promise";
+import { composeWithDevTools } from "redux-devtools-extension";
+import reducer from "./reducer";
+
+
+const store = createStore(
+    reducer,
+    composeWithDevTools(applyMiddleware(reduxPromise))
+);
 
 if (location.pathname == "/welcome") {
     var elem = <Welcome />;
 } else {
-    elem = <App />;
+    elem = (
+        <Provider store={store}>
+            <App />
+        </Provider>
+    );
 }
+// Provider provides access to app (and components in app)
 
-// render the wrapper
+// we only call ReactDOM render once in your whole project
 ReactDOM.render(elem, document.querySelector("main"));
-
-// property document.cookie (Javascript could read the cookie/ but middleware prevents that)
-
-// is the user logged in or not?
-// if the user is logged out the url is /welcome

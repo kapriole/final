@@ -7,7 +7,7 @@ export default function useAuthSubmit() {
     const [error, setError] = useState(false); // you should specify your error messages
 
     const submit = () => {
-        axios.post(url, values).then({ data })=> {
+        axios.post(url, values).then({ data }) => {
         if (data.success) {
             location.pathname('/');
         } else {

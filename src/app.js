@@ -8,6 +8,7 @@ import Profile from "./profile";
 import ProfilePic from "./profilepic";
 import OtherProfile from "./otherprofile";
 import FindPeople from "./findpeople";
+import Friends from "./friends";
 
 
 export default class App extends React.Component {
@@ -73,7 +74,7 @@ export default class App extends React.Component {
 
         return (
             <React.Fragment>
-            <BrowserRouter>
+                <BrowserRouter>
                     <div
                         style={{
                             position: "relative",
@@ -137,11 +138,20 @@ export default class App extends React.Component {
                                     />
                                 )}
                             />
+                            <Route
+                                path="/friends/:id"
+                                render={(props) => (
+                                    <Friends
+                                        key={props.match.url}
+                                        match={props.match}
+                                        history={props.history}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </BrowserRouter>
             </React.Fragment>
-
         );
     }
 }

@@ -393,7 +393,7 @@ app.get("/user/:id.json", (req, res) => {
         res.json({ redirect: true });
     }
     // console.log("req.session", req.body.id);
-    const userId = req.params.id;
+    const userId = req.params.id; // is other User Id
     db.getUserInfoById(userId)
         .then(({rows}) => {
             console.log("result from getUserInfo", {rows});
@@ -538,6 +538,8 @@ app.get("/initial-friendship-status/:otherUserId", (req, res) => {
     }).catch(err => { console.log("error in checking the friendship status!", err);});
 });
 
+// put the logic to the front else I have to do it twice
+
 // 1. if 2 users have no row  they have no friendship
 // 2. if 2 users have a row & accepted row is true ! they have a friendship
 // 3. if they have a row they have some relationship
@@ -588,6 +590,21 @@ app.post("/end-friendship/:otherUserId", (req, res) => {
         .catch((err) => {
             console.log("error in deleting the friendship!", err);
         });
+});
+
+
+//// Friends Wannabes Redux 
+// use otherUserId?
+
+app.get("/friends-wannabes", (req, res) => {
+    // const userId = req.session.userId;
+    // get the other users id
+    db.getFriendsList(userId).then((data) => {
+        console.log("data", data);
+        res.json({ data });
+    }).catch((err) => {
+        console.log("error in retrieving the friendslist and wannabes!", err);
+    });
 });
 
 
