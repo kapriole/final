@@ -4,12 +4,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { receiveFriendsWannabes, acceptFriendRequest, unfriend } from "./actions";
-import { deleteFriendship } from "../utils/db";
 
-export default function Friends(props) {
+// do I need props?
 
-    //  let ImgUrl = props.imgUrl || "./images/default.png";
-    //  let alt = `${props.first} ${props.last}`;
+export default function Friends() {
     
     // dipatch an action when it mounts
 
@@ -18,6 +16,8 @@ export default function Friends(props) {
         useDispatch(receiveFriendsWannabes());
     }, []);
     */
+    
+    //console.log("props", props);
 
     const friendsWannabes = useSelector(
         (state) =>
@@ -42,11 +42,17 @@ export default function Friends(props) {
         return null;
     }
 
-
+    
+    if (!trueFriends) {
+        return null;
+    }
 
     // render two lists using map !
+
     // for the accept friend request button... when it's clicked we'll want to dispatch our acceptFriendRequest action
     // for the end friendship button... when it's clicked we'll want to dispatch the unfriend action
+
+    // check git make one for friends and one for wannabes in two divs and then render conditoionally and map!!! 
 
     return (
         <React.Fragment>
@@ -61,13 +67,11 @@ export default function Friends(props) {
                         <button
                             onClick={() =>
                                 useDispatch(
-                                    acceptFriendRequest(
-                                        friendsWannabes[0].id
-                                    )
+                                    acceptFriendRequest(friendsWannabes[0].id)
                                 )
                             }
                         >
-                            accept friend request
+                          accept friend request
                         </button>
                     </div>
                 </div>
@@ -77,14 +81,11 @@ export default function Friends(props) {
                     <div className="friends">
                         <button
                             onClick={() =>
-                                useDispatch(
-                                    deleteFriendship(
-                                        friendsWannabes[0].id
-                                    )
-                                )
+                                useDispatch(unfriend(friendsWannabes[0].id))
                             }
                         >
-                        end friendship </button>
+                            end friendship{" "}
+                        </button>
                     </div>
                 </div>
 

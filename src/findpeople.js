@@ -1,10 +1,8 @@
 import React, { useState, useEffect, Link } from "react";
 import axios from "./axios";
 
-// do export ?
-
 // get the users array form ajax
-
+ 
 export default function FindPeople() {
     const [recentUsers, displayRecentUsers] = useState([]);
     const [users, findUsers] = useState([]);
@@ -67,11 +65,6 @@ export default function FindPeople() {
     // conditional rendering and return the right stuff / get the right users {&&}
 
     // open the search field 
-
-    
-
-
-
 
     return (
         <React.Fragment>

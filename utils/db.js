@@ -132,7 +132,6 @@ module.exports.updateBio = (userId, bio) => {
     return db.query(q, params);
 };
 
-
 /// Get the users that where recently registered
 
 module.exports.getRecentUsers = () => {
@@ -157,8 +156,8 @@ module.exports.findUsers = (input) => {
 module.exports.checkFriendship = (userId, otherUserId) => {
     const q = `
         SELECT * FROM friendships 
-        WHERE (receiver_id = $1 AND sender_id = $2)
-        OR (receiver_id = $2 AND sender_id = $1)
+        WHERE (receiver_id = $2 AND sender_id = $1)
+        OR (receiver_id = $1 AND sender_id = $2)
     `;
     const params = [userId, otherUserId];
     return db.query(q, params);
@@ -167,9 +166,8 @@ module.exports.checkFriendship = (userId, otherUserId) => {
 
 module.exports.makeFriendshipRequest = (userId, otherUserId) => {
     const q = `
-        INSERT INTO friendships 
-        WHERE (receiver_id = $1 AND sender_id = $2)
-        OR (receiver_id = $2 AND sender_id = $1)
+        INSERT INTO friendships (sender_id, receiver_id)
+        VALUES ($1, $2)
     `;
     const params = [userId, otherUserId];
     return db.query(q, params);
@@ -180,7 +178,7 @@ module.exports.acceptFriendship = (userId, otherUserId) => {
     const q = `
         UPDATE friendships 
         SET accepted=true
-        WHERE receiver_id = $1 AND sender_id = $2
+        WHERE (receiver_id = $1 AND sender_id = $2)
     `;
     const params = [userId, otherUserId];
     return db.query(q, params);
@@ -202,12 +200,12 @@ module.exports.deleteFriendship = (userId, otherUserId) => {
 
 module.exports.getFriendsList = (userId) => {
     const q = `
-    SELECT users.id, first, last, image, accepted
+    SELECT users.id, first, last, class, img_url, accepted
     FROM friendships
     JOIN users
-    ON (accepted = false AND recipient_id = $1 AND requester_id = users.id)
-    OR (accepted = true AND recipient_id = $1 AND requester_id = users.id)
-    OR (accepted = true AND requester_id = $1 AND recipient_id = users.id)
+    ON (accepted = false AND receiver_id = $1 AND sender_id = users.id)
+    OR (accepted = true AND receiver_id = $1 AND sender_id = users.id)
+    OR (accepted = true AND receiver_id = $1 AND sender_id = users.id)
     `;
     const params = [userId];
     return db.query(q, params);

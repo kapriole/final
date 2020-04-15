@@ -1,17 +1,17 @@
 // src/actions.js
 
-// import import { connect } from 'react-redux'
 import axios from "./axios";
 
-
 // const { data } = await axios.get("/users");
+
+// get the other
 
 export function receiveFriendsWannabes() {
     axios
         .get("/friends-wannabes")
         .then(({ data }) => {
             console.log("data from wannabes axios get", data);
-            //const friends = data.friendsWannabes;
+            // const friends = data.friendsWannabes;
             // the data will contain a list with all the wannabes and friends
             // here we get the object with (object.type and object.friendsWannabes = [array of friends and wannabes from the server]
             // get the array and add it to the object
@@ -21,7 +21,7 @@ export function receiveFriendsWannabes() {
         });
     return {
         type: "RECEIVE_FRIENDS_WANNABES",
-        friendsWannabes: data.friendsWannabes // is the array with everything
+        friendsWannabes: data.friendsWannabes, // is the array with everything // make some friends and check the array // why is data not defined?
     };
 }
 
@@ -51,7 +51,7 @@ export function unfriend(otherUserId) {
             console.log("error from end Friendship axios post", error);
         });
     return {
-        type: "END_FRIENDSHIP",
+        type: "UNFRIEND",
         otherUserId // id of the user whose friendship was ended
     };
 }

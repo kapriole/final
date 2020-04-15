@@ -1,5 +1,13 @@
 const express = require("express");
 const app = express();
+
+//// websockets
+
+/*
+const server = require('http').Server(app);
+const io = require('socket.io')(server, { origins: 'localhost:8080' });
+*/
+
 const compression = require("compression");
 const cryptoRandomString = require("crypto-random-string");
 const secretCode = cryptoRandomString({
@@ -386,7 +394,7 @@ app.get("/user", (req, res) => {
 });
         
               
-/// get User by Id
+/// get OtherProfile / User by Id
  
 app.get("/user/:id.json", (req, res) => {
     if (req.params.id == req.session.userId) {
@@ -396,7 +404,7 @@ app.get("/user/:id.json", (req, res) => {
     const userId = req.params.id; // is other User Id
     db.getUserInfoById(userId)
         .then(({rows}) => {
-            console.log("result from getUserInfo", {rows});
+            console.log("result from getUserInfo", rows);
             res.json(rows[0] || { redirect: "/"});
         })
         .catch(err => {
@@ -513,47 +521,25 @@ app.post("/bio", (req, res) => {
 /// initial status of the friendship has to be checked all the time
 
 app.get("/initial-friendship-status/:otherUserId", (req, res) => {
-    // I got back the other users id
-    // console.log("req.session", req.session);
-    // I can already check this in the front
     const userId = req.session.userId;
-    const otherUserId = req.body.otherUserId; // or params? from the url
-    // not necessary bc I cant be the other user
+    const otherUserId = req.params.otherUserId; 
+    console.log("user Id and otherUsserId", userId, otherUserId);
     db.checkFriendship(userId, otherUserId).then(result => {
-        console.log("data", result);
-        if (result.rows.length == 0) {
-            console.log("no friendship exists");
-            res.json({ friendship: "no friendship" });
-        } else if (result.rows[0].accepted == false) {
-            console.log("friendship is pending / who is who?");
-            if (result.rows[0].accepted == result.rows.userId) // check it 
-            {
-                console.log("the friendship wasnt accepted yet");
-                res.json({ friendship: "cancel friendship request" });
-            }
-            else { res.json({ friendship: "accept friendship" }); }
-        } else {
-            res.json({ friendship: "end friendship" });
-        }
+        console.log("result in friendship status", result.rows); // console.log("result", result);
+        res.json(result.rows);
     }).catch(err => { console.log("error in checking the friendship status!", err);});
 });
 
-// put the logic to the front else I have to do it twice
-
-// 1. if 2 users have no row  they have no friendship
-// 2. if 2 users have a row & accepted row is true ! they have a friendship
-// 3. if they have a row they have some relationship
-
+// result on the back and data in the front
 
 ///// the user clicks the Make Friend Request 
 
 app.post("/make-friend-request/:otherUserId", (req, res) => {
     const userId = req.session.userId;
-    const otherUserId = req.body.otherUserId; // or params? 
+    const otherUserId = req.params.otherUserId; 
     db.makeFriendshipRequest(userId, otherUserId)
-        .then((data) => {
-            console.log("data", data);
-            res.json({ data: "friendship pending" });
+        .then(result => {
+            res.json(result.rows);
         })
         .catch((err) => {
             console.log("error in making the friendship request!", err);
@@ -565,11 +551,10 @@ app.post("/make-friend-request/:otherUserId", (req, res) => {
 app.post("/add-friendship/:otherUserId", (req, res) => {
     // db Updates the column accepted to true
     const userId = req.session.userId;
-    const otherUserId = req.body.otherUserId; // or params?
+    const otherUserId = req.params.otherUserId; 
     db.acceptFriendship(userId, otherUserId)
-        .then((data) => {
-            console.log("data", data);
-            res.json({ data: "friendship accepted" });
+        .then((result) => {
+            res.json(result.rows);
         })
         .catch((err) => {
             console.log("error in accepting the friendship!", err);
@@ -581,11 +566,10 @@ app.post("/add-friendship/:otherUserId", (req, res) => {
 app.post("/end-friendship/:otherUserId", (req, res) => {
     // db Updates the column accepted to true
     const userId = req.session.userId;
-    const otherUserId = req.body.otherUserId; // or params?
+    const otherUserId = req.params.otherUserId; // or params?
     db.deleteFriendship(userId, otherUserId)
-        .then((data) => {
-            console.log("data", data);
-            res.json({ data: "friendship accepted" });
+        .then((result) => {
+            res.json(result.rows);
         })
         .catch((err) => {
             console.log("error in deleting the friendship!", err);
@@ -597,7 +581,7 @@ app.post("/end-friendship/:otherUserId", (req, res) => {
 // use otherUserId?
 
 app.get("/friends-wannabes", (req, res) => {
-    // const userId = req.session.userId;
+    const userId = req.session.userId;
     // get the other users id
     db.getFriendsList(userId).then((data) => {
         console.log("data", data);
@@ -605,6 +589,14 @@ app.get("/friends-wannabes", (req, res) => {
     }).catch((err) => {
         console.log("error in retrieving the friendslist and wannabes!", err);
     });
+});
+
+
+///// LOGOUT 
+
+app.get("/logout", (req, res) => {
+    req.session = null; // new cookie-session
+    res.redirect("/welcome");
 });
 
 
@@ -619,7 +611,17 @@ app.get("*", function (req, res) {
     }
 });
 
+// websocket io make server listen !
 
 app.listen(8080, function() {
     console.log("I'm listening.");
 });
+
+/* 
+io.on("connection", socket => {
+    console.log(`a socket with the id ${socket.id} just connected`);
+    socket.on("disconnet", ()=> {
+        console.log(`a socket with the id ${socket.id} just disconnected`);
+    });
+});
+*/

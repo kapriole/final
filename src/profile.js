@@ -1,6 +1,8 @@
 import React from "react";
 import Presentational from "./presentational";
 import Bioeditor from "./bioeditor";
+import styled from "styled-components";
+
 
 /// get the props from app and pass it to Bioeditor
 // can't use this in function / use es6 class
@@ -12,6 +14,16 @@ import Bioeditor from "./bioeditor";
 // get props
 
 
+// styles
+
+const HoverText = styled.p`
+    :hover {
+        color: #ed1233;
+        cursor: pointer;
+    }
+`;
+
+
 export default function Profile({ first, last, element, imgUrl, bio, setBio, toggleModal }) {
     let ImgUrl = imgUrl || "./images/default.png";
     let alt = `${first} ${last}`;
@@ -19,8 +31,8 @@ export default function Profile({ first, last, element, imgUrl, bio, setBio, tog
     return (
         <React.Fragment>
             <h2>
-                Welcome to your userprofile {first}
-                {last} ! <br></br> Element:{element}
+                Welcome to your user profile <br></br>
+                {first} {last} ! <br></br>
             </h2>
             <Presentational
                 alt={alt}
@@ -28,9 +40,13 @@ export default function Profile({ first, last, element, imgUrl, bio, setBio, tog
                 first={first}
                 last={last}
             />
-            <h2 onClick={toggleModal}>toggle the uploader</h2>
-
+            <br></br> Element: {element}
+            <br></br> <br></br>
             <Bioeditor bio={bio} setBio={setBio} />
+            <HoverText
+                onClick={toggleModal}>
+                upload a new photo!
+            </HoverText>
         </React.Fragment>
     );   
     

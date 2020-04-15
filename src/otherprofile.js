@@ -1,6 +1,7 @@
 
 import React from "react";
 import axios from "./axios"; 
+import Presentational from "./presentational";
 import FriendButton from "./hooks/friendbutton";
 
 export default class OtherProfile extends React.Component {
@@ -10,21 +11,20 @@ export default class OtherProfile extends React.Component {
     }
     
     componentDidMount() {
-        console.log("this.props in other profile!", this.props);
         // id is the userId 
-        const id = this.props.match.params.id; // this object contains the paths params from the router labeled with :colon
+        console.log("OtherProfile: this.props", this.props);
+        const id = Number(this.props.match.params.id); // this object contains the paths params from the router labeled with :colon
         axios.get(`/user/${id}.json`).then(
             data => {
-                console.log("data in get user id in otherprofile", data);
                 if (data.redirect) {
                     this.props.history.push("/");
                 } else {
                     this.setState({
-                        id: data.data.userId, // check id
+                        otherUserId: data.data.id, // check otherUderId
                         first: data.data.first,
                         last: data.data.last,
-                        element: data.data.element,
-                        imgUrl: data.data.imgUrl, 
+                        element: data.data.class,
+                        imgUrl: data.data.img_url,
                         bio: data.data.bio
                     });
                     // new data / puts the current userId of the other user in here
@@ -37,14 +37,22 @@ export default class OtherProfile extends React.Component {
         return (
             <React.Fragment>
                 <div>
-                    <h1>
-                        {this.state.first} {this.state.last}
-                    </h1>
-                    <img src={this.state.imgUrl}></img>
-                    <p value={this.state.bio}>P Tag for your biotext</p>
+                    <h2>
+                        Welcome to {this.state.first}s user profile <br></br>
+                    </h2>
+                    <Presentational
+                        alt={(this.state.first, this.state.last)}
+                        imgUrl={this.state.imgUrl}
+                    />
+                    <br></br> Element: {this.state.element}
+                    <br></br> <br></br>
+                    <p value={this.state.bio}>
+                        This should show the users bio/ if no bio show nobio
+                    </p>
                     <FriendButton
-                        userId = {this.props.userId}
-                        otherUserId={this.state.id} />
+                        userId={this.props.userId}
+                        otherUserId={this.props.match.params.id}
+                    />
                 </div>
             </React.Fragment>
         );

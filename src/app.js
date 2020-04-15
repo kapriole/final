@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "./axios"; // this is already the copy 
-import { BrowserRouter, Route, Link } from "react-router-dom";
-import "./styles/app.css";
+import { BrowserRouter, Route } from "react-router-dom";
 import Logo from "./logo";
 import Uploader from "./uploader";
 import Profile from "./profile";
@@ -10,13 +9,13 @@ import OtherProfile from "./otherprofile";
 import FindPeople from "./findpeople";
 import Friends from "./friends";
 
+// import styled from "styled-components";
 
 export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-        console.log("props in app", props);
+    constructor() {
+        super();
         this.state = {
-            uploaderIsVisible: true
+            //uploaderIsVisible: true
         };
         this.myImgUrl = this.myImgUrl.bind(this);
         this.setBio = this.setBio.bind(this);
@@ -30,7 +29,7 @@ export default class App extends React.Component {
             .then(userdata => {
                 console.log("data", userdata.data);
                 this.setState({
-                    id: userdata.data.userId,
+                    userId: userdata.data.userId,
                     first: userdata.data.first,
                     last: userdata.data.last,
                     element: userdata.data.element,
@@ -63,15 +62,6 @@ export default class App extends React.Component {
     }
 
     render() {
-        console.log(this.state);
-        console.log("props in app", this.props.first);
-
-        // reorganize the structure
-
-        // make a fixed header
-
-        //check if all the right props/methods are passed to the children! in render
-
         return (
             <React.Fragment>
                 <BrowserRouter>
@@ -87,11 +77,12 @@ export default class App extends React.Component {
                             first={this.state.first}
                             last={this.state.last}
                             imgUrl={this.state.imgUrl}
-                            onClick={this.toggleModal}
                         />
+
                         <div
                             style={{
                                 position: "absolute",
+                                marginLeft: "11%",
                                 fontFamily: "Impact, Charcoal, sans-serif",
                                 color: "cornflowerblue",
                             }}
@@ -101,7 +92,7 @@ export default class App extends React.Component {
                                 path="/"
                                 render={() => (
                                     <Profile
-                                        id={this.state.id}
+                                        userId={this.state.userId}
                                         first={this.state.first}
                                         last={this.state.last}
                                         element={this.state.element}
@@ -124,6 +115,7 @@ export default class App extends React.Component {
                                         key={props.match.url}
                                         match={props.match}
                                         history={props.history}
+                                        userId={this.state.userId}
                                     />
                                 )}
                             />
@@ -131,7 +123,7 @@ export default class App extends React.Component {
                                 path="/users"
                                 render={() => (
                                     <FindPeople
-                                        id={this.state.id}
+                                        userId={this.state.userId}
                                         first={this.state.first}
                                         last={this.state.last}
                                         imgUrl={this.state.imgUrl}
@@ -145,6 +137,7 @@ export default class App extends React.Component {
                                         key={props.match.url}
                                         match={props.match}
                                         history={props.history}
+                                        userId={this.state.userId}
                                     />
                                 )}
                             />
@@ -155,6 +148,3 @@ export default class App extends React.Component {
         );
     }
 }
-
-
-// Link to other Pages

@@ -5,19 +5,19 @@ import React from "react";
 // this is the profile pic !!!
 
 export default function Presentational({first, last, imgUrl}) {
-    console.log("props in pres", first, last, imgUrl);
+    //console.log("props in pres", first, last, imgUrl);
     let ImgUrl = imgUrl || "./images/default.png";
    
     return (
         <React.Fragment>
-            <h2>I&aposm the presentaional component</h2>
-            <h2>
-                My name is: {first} {last}
-            </h2>
             <img
-                style={{ maxWidth: "150px" }}
+                style={{
+                    maxWidth: "300px",
+                    maxHeight: "300px",
+                    overflow: "hidden"
+                }}
                 src={ImgUrl}
-                alt={first}
+                alt={first, last} 
             />
         </React.Fragment>
     );

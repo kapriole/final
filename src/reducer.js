@@ -1,13 +1,9 @@
 // src/reducer.js
 
-import {
-    receiveFriendship,
-    acceptFriendRequest,
-    unfriend
-} from "./actions";
+// what do I need to import is it action file or type?
 
 export default function reducer(state = {}, action) {
-    if (action.type == RECEIVE_FRIENDS_WANNABES) {
+    if (action.type == "RECEIVE_FRIENDS_WANNABES") {
         console.log("RECEIVE_FRIENDS_WANNABES");
         state = {
             ...state,
@@ -18,7 +14,7 @@ export default function reducer(state = {}, action) {
 
     // user should be friends
 
-    if (action.type == ACCEPT_FRIEND_REQUEST) {
+    if (action.type == "ACCEPT_FRIEND_REQUEST") {
         console.log("ACCEPT_FRIEND_REQUEST");
         state = {
             ...state, // clone global state // who is the user?
@@ -40,7 +36,7 @@ export default function reducer(state = {}, action) {
 
     // user should be no-more-friends (but are no friends wannabes no? only when they request)
 
-    if (action.type == UNFRIEND) {
+    if (action.type == "UNFRIEND") {
         console.log("END_FRIENDSHIP");
         state = {
             ...state, // clone global state // who is the user?
@@ -49,7 +45,8 @@ export default function reducer(state = {}, action) {
                     // id of user who accepted request and is friend
                     return {
                         ...user,
-                        // remove the user with the otherUserId from the array
+                        // remove the user with the otherUserId 
+                        // from the array/ alter accepted ?
                     };
                 } else {
                     // runs for all the people who are not yet my friends
@@ -60,6 +57,6 @@ export default function reducer(state = {}, action) {
     }
 }
 
-//check the IDs
+// check the IDs
 
-// useSelector
+// useSelector?

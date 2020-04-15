@@ -47,7 +47,6 @@ export default class Uploader extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <h3>This is the uploader component!!</h3>
                 <input
                     onChange={(e) => this.handleChange(e)}
                     type="file"

@@ -4,84 +4,83 @@ import axios from "../axios";
 // import Other Profile?
 
 export default function FriendButton(props) {
-    const [buttonText, setButtonText] = useState("");
+    const [buttonText, setButtonText] = useState("Make Friend Request");
     // useState is empty and checks every time in axios setButtonText
-
-    // the the other user's id it gets from the OtherProfile component
-
-    // the axiosget checks if the status has changed and then sets the buttonText according to the current State
-    console.log("props in friendbutton", props);
-
+    console.log("props in friendsbutton", props);
     // check otherUserId //params
-    const otherUserId = props.otherUserId;
-    
+    const otherUserId = Number(props.otherUserId); // result is a string not a number why??
+
+    // userId is sender id // otherUserId is receiver id // accepted is friendship or pending
+    // how can I get the user id? // it's undefined changed user.id  to userId / props.userId 
 
     useEffect(() => {
-
+        console.log(
+            "useEffect started and axios gets freindsprops in friendbutton",
+            props
+        );
         axios
-            .get(`/initial-friendship-status/:otherUserId`)
+            .get("/initial-friendship-status/" + otherUserId)
             .then(({ data }) => {
-                console.log("data", data);
-                // check what responses you need who is receiver and who is sender?
-                // get response.data // data has response object 
-
-                setButtonText({
-                    buttonText: "Make Friend Request", // in here just set it to the response from the server
-                });
-                // axios request to get the relationship of the two users
+                console.log("data from the db", data);
+                if (data.length == 0) {
+                    setButtonText(
+                        "Make Friend Request" // in here just set it to the response from the server
+                    );
+                } else if (data[0].accepted == false) {
+                    console.log("friendship is pending");
+                    if (data[0].receiver_id == props.otherUserId) {
+                        console.log("the friendship wasnt accepted yet");
+                        setButtonText("Cancel Friend Request");
+                    } else {
+                        setButtonText("Accept Friend Request");
+                    }
+                } else {
+                    setButtonText("End Friend Request");
+                }
                 // update button text // depending on the result from axios
                 // set the buttonText depending on the user's id
+            })
+            .catch((error) => {
+                console.log(
+                    "error in get friendship status/ maybe no fs yet",
+                    error
+                );
             });
-    }, []);
+    }, [buttonText]);
 
-    // when does friendbutton mount? 
-
-    // handle the logic in rendering the button given the state 
-
-    // "Make Friend Request" to "Cancel Friend Request"
-    // "Cancel Friend Request" -> "Make Friend Request"
-    // "Accept Friend Request" -> "End Friendship"
-    // "End Friendship" -> "Make Friend Request"
-
-    // do I have to do this in both? back and front
-
-    // on the OtherUsersProfile my Id doesnt matter
-    // I have to check the Other Users Id in the backend ---> where does this happen?
+    // yeah it works?
 
     const handleClick = () => {
+        console.log("buttonText", buttonText);
         if (buttonText == "Make Friend Request") {
             axios
-                .post("/make-friend-request/:otherUserId")
-                .then(({ data }) => {
+                .post("/make-friend-request/" + otherUserId)
+                .then((data) => {
                     // check if the request was sent!
-                    console.log("data", data);
-                    setButtonText({
-                        buttonText: "Cancel Friend Request",
-                    });
+                    console.log("data in handleClick make friend request", data);
+                    setButtonText(buttonText == "Cancel Friend Request");
                 })
                 .catch((err) => {
                     console.log("err in axios post make friend request", err);
                 });
         } else if (buttonText == "Accept Friend Request") {
             axios
-                .post("/add-friendship/:otherUserId")
-                .then(({ data }) => {
+                .post("/add-friendship/" + otherUserId)
+                .then((data) => {
                     console.log("data", data);
-                    setButtonText({
-                        buttonText: "End Friendship",
-                    });
+                    setButtonText(
+                        buttonText == "End Friendship"
+                    );
                 })
                 .catch((err) => {
                     console.log("err in axios post make friend request", err);
                 });
         } else if (buttonText == "End Friendship" || "Cancel Friend Request") { // does it work like this?
             axios
-                .post("/end-friendship/:otherUserId")
-                .then(({ data }) => {
+                .post("/end-friendship/" + otherUserId)
+                .then((data) => {
                     console.log("data", data);
-                    setButtonText({
-                        buttonText: "Make Friend Request"
-                    });
+                    setButtonText(buttonText == "Make Friend Request");
                 })
                 .catch((err) => {
                     console.log("err in axios post make friend request", err);
@@ -89,11 +88,11 @@ export default function FriendButton(props) {
         } else {
             console.log("error in handleclick friendbutton");
         }
-
     };
-
-    return (<button onClick={handleClick}>{buttonText}</button>);
+    return <button onClick={handleClick}> {buttonText}</button>;
 }
+
+// objects are not valid as react child! {props.buttonText} remove the curly bracket from the logic in axios
 
 // we have to update buttonText and then change the Text and the Functionality of the button
 // 1st dataflow what's on the button when the user goes to another user's page
