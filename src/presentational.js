@@ -21,6 +21,4 @@ export default function Presentational({first, last, imgUrl}) {
             />
         </React.Fragment>
     );
-    
 }
-   

@@ -21,7 +21,7 @@ export default class Welcome extends React.Component {
                         top: "40%",
                         transform: "translate(-50%, -50%)",
                         fontFamily: "Impact, Charcoal, sans-serif",
-                        color: "cornflowerblue"
+                        color: "cornflowerblue",
                     }}
                 >
                     <h1>Welcome to ...</h1>
@@ -39,3 +39,5 @@ export default class Welcome extends React.Component {
 }
 
 // have to update the reset part 
+
+// link doesnt work to "/welcome#/login"

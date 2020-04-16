@@ -17,6 +17,18 @@ module.exports.addUser = (first, last, mail, element, password, bio, imgUrl) => 
     return db.query(q, params);
 };
 
+
+module.exports.getUserLogin = (mail) => {
+    const q = `
+    SELECT users.email, users.pass, users.id, users.first, users.last, users.img_url, users.class
+    FROM users
+    WHERE email = $1
+    `;
+    const params = [mail];
+    return db.query(q, params);
+};
+
+
 //// FIND USER BY MAIL
 
 module.exports.getUser = mail => {
@@ -25,8 +37,9 @@ module.exports.getUser = mail => {
     users.id
     users.first,
     users.last,
+    users.class,
     users.email,
-    users.password,
+    users.pass,
     FROM users
     RETURNING *
     `;
@@ -39,7 +52,7 @@ module.exports.getUser = mail => {
 module.exports.getUserInfoById = userId => {
     const q = `
         SELECT * FROM users
-        WHERE id = $1
+        WHERE users.id = $1
     `;
     const params = [userId];
     return db.query(q, params);
@@ -88,8 +101,6 @@ module.exports.updatePassword = (mail, newHashedPW) => {
     const params = [mail, newHashedPW]; // do I have to use the hashedPW?
     return db.query(q, params);
 };
-
-
 
 
 /// add the code
@@ -200,12 +211,29 @@ module.exports.deleteFriendship = (userId, otherUserId) => {
 
 module.exports.getFriendsList = (userId) => {
     const q = `
-    SELECT users.id, first, last, class, img_url, accepted
+    SELECT (users.id, first, last, class, img_url, accepted)
     FROM friendships
     JOIN users
     ON (accepted = false AND receiver_id = $1 AND sender_id = users.id)
     OR (accepted = true AND receiver_id = $1 AND sender_id = users.id)
     OR (accepted = true AND receiver_id = $1 AND sender_id = users.id)
+    `;
+    const params = [userId];
+    return db.query(q, params);
+};
+
+/// CHAT
+
+// DB query will need to be a JOIN 
+// I need info from users (first, last, class, image and chat text, timestamp) and chats
+// the most recent chat message at the bottom!
+
+module.exports.getLastTenMessages = (userId) => {
+    const q = `
+    SELECT (users.id, first, last, class, img_url, chat.message_text, chat.created_at)
+    FROM users
+    JOIN chat
+    ON (sender_id = $1)
     `;
     const params = [userId];
     return db.query(q, params);

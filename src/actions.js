@@ -2,26 +2,27 @@
 
 import axios from "./axios";
 
-// const { data } = await axios.get("/users");
-
 // get the other
+
+// data is an object that comes back from wannabes
 
 export function receiveFriendsWannabes() {
     axios
         .get("/friends-wannabes")
-        .then(({ data }) => {
+        .then(({ data } ) => {
             console.log("data from wannabes axios get", data);
             // const friends = data.friendsWannabes;
             // the data will contain a list with all the wannabes and friends
             // here we get the object with (object.type and object.friendsWannabes = [array of friends and wannabes from the server]
             // get the array and add it to the object
+            // how can I check if the array is empty?
         })
         .catch((error) => {
             console.log("error from wannabes axios", error);
         });
     return {
         type: "RECEIVE_FRIENDS_WANNABES",
-        friendsWannabes: data.friendsWannabes, // is the array with everything // make some friends and check the array // why is data not defined?
+        friendsWannabes: data // is the array with everything // make some friends and check the array // why is data not defined?
     };
 }
 
@@ -57,3 +58,25 @@ export function unfriend(otherUserId) {
 }
 
 // The object it returns is the action
+
+// in here comes the ten last chat messages
+
+// the the latest chat message
+
+
+export function latestChatMessages(socketUserId) {
+    // get  it from the socket.js /  the websocket
+    return {
+        type: "GET_LATEST_MESSAGES",
+        socketUserId // id of the user whose friendship was ended
+    };
+}
+
+
+export function addChatMessage(userId) {
+    // get  it from the socket.js /  the websocket
+    return {
+        type: "ADD_MESSAGE",
+        userId // id of the user whose friendship was ended
+    };
+}

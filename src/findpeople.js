@@ -20,7 +20,7 @@ export default function FindPeople() {
             ignore = true;
             console.log("displayRecentUsers clean up function");
         };
-    }, []); // end useEffect
+    }, [recentUsers]); // end useEffect
 
     console.log("recetnusers", recentUsers);
 

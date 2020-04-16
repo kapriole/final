@@ -1,19 +1,40 @@
 const express = require("express");
 const app = express();
 
-//// websockets
 
-/*
+//// websockets code
 const server = require('http').Server(app);
 const io = require('socket.io')(server, { origins: 'localhost:8080' });
+
+// cookies before csurf
+
+//// cookie-session break-up
+const cookieSession = require("cookie-session");
+
+/*
+app.use(
+    cookieSession({
+        secret: "very secret",
+        maxAge: 1000 * 60 * 60 * 24 * 10
+    })
+);
 */
+const cookieSessionMiddleware = cookieSession({
+    secret: "very secret",
+    maxAge: 1000 * 60 * 60 * 24 * 10
+});
+
+app.use(cookieSessionMiddleware);
+
+io.use(function (socket, next) {
+    cookieSessionMiddleware(socket.request, socket.request.res, next);
+});
 
 const compression = require("compression");
 const cryptoRandomString = require("crypto-random-string");
 const secretCode = cryptoRandomString({
     length: 6
 });
-const cookieSession = require("cookie-session");
 
 const s3 = require("./s3");
 
@@ -66,12 +87,6 @@ app.use(
 
 app.use(express.json());
 
-app.use(
-    cookieSession({
-        secret: "very secret",
-        maxAge: 1000 * 60 * 60 * 24 * 10
-    })
-);
 
 /// csurf after cookie !!! 
 app.use(csurf());
@@ -79,7 +94,6 @@ app.use(csurf());
 app.use(function(req, res, next) {
     const token = req.csrfToken();
     res.cookie("OHMYGLOB", token);
-    // res.locals.csrfToken = token;
     next();
 });
 
@@ -166,10 +180,7 @@ app.post("/register", function (req, res) {
                         bio: result.rows[0].bio,
                         imgUrl: result.rows[0].img_url
                     };
-                    //(node:3262) UnhandledPromiseRejectionWarning: error: column "mail" of relation "users" does not exist
-                    console.log("req.session.user", req.session.user);
                     // adjust the cookies
-                    // res.redirect("/profile");
                     res.json({ success: true });
                 })
                 .catch(error => {
@@ -179,9 +190,6 @@ app.post("/register", function (req, res) {
         })
         .catch(error => {
             console.log("error in post welcome hash", error);
-            // first general error message
-            // new regsitration?
-            // use connditional rendering in react
             res.sendFile(__dirname + "/index.html");
 
         });
@@ -189,73 +197,45 @@ app.post("/register", function (req, res) {
 
 // registration data saved in database
 
-
 //////////////// LOGIN
+
 
 app.get("/login", (req, res) => {
     // user must be logged out and exist
     // then render the index.html
     res.sendFile(__dirname + "/index.html");
-
 });
 
-/// req.session.csrfToken is not a function
 
 app.post("/login", (req, res) => {
-    // check first if the user exists
-    // and if user is logged out
+    console.log("req.session", req.session);
     const password = req.body.pass;
     const mail = req.body.email;
-    // do I have to do const for each route??
+    console.log("made it login route in backend!");
+    console.log("password", password);
 
     // get user by email
-    db.getUser(mail)
-        .then(result => {
+
+    db.getUserLogin(mail)
+        .then((result) => {
             console.log("result", result);
             console.log("result.rows", result.rows);
-            // check if already logged in
-            if (result.rows[0]) {
-                req.session.userId = true;
-            }
-            // set cookie to remember
-            // check if user exxists 
-            const hashfromDB = result.rows[0].password;
-            compare(password, hashfromDB);
-        })
-        .then(matchValue => {
-            console.log("matche value of compare", matchValue);
-            // if the password matches ... set the user_id
-            if (matchValue) {
-                // here set the user session
-                req.session = {
-                    userId: matchValue.rows[0].id,
-                    first: matchValue.rows[0].first,
-                    last: matchValue.rows[0].last,
-                    element: matchValue.rows[0].class, // or class?
-                    mail: matchValue.rows[0].email, // stick to one?
-                    bio: matchValue.rows[0].bio,
-                    imgUrl: matchValue.rows[0].img_url
-                };
-                // check if the user has a userId 
-                db.getUserId(req.session.userId)
-                    .then(result => {
+            const hashfromDB = result.rows[0].pass;
+            console.log("haschfromdb", hashfromDB);
+            compare(password, hashfromDB)
+                .then((matchedValue) => {
+                    if (matchedValue) {
                         req.session.userId = result.rows[0].id;
-                        // congrats user exists
-                        // res.sendFile(__dirname + "/index.html");
-                        res.json({ success: true });
-                        // add conditional rendering to the index file
-
-                    })
-                    .catch(error => {
-                        console.log("error in get User Id", error);
-                        res.json({ success: false });
-                    });
-            } else {
-                console.log("Eror in login / matchvalue");
-            }
+                    }
+                    console.log("req.session.userId", req.session.userId);
+                    res.json({ success: true });
+                })
+                .catch((error) => {
+                    console.log("err in matchvalue ", error);
+                });
         })
-        .catch(error => {
-            console.log("err in where?: ", error);
+        .catch((error) => {
+            console.log("err in getUserLogin: ", error);
         });
 });
 
@@ -277,6 +257,8 @@ app.post("/test-email", (req, res) => {
             // something went wrong
         });
 });
+
+// get the secretcode in here
 
 /// I forgot my password --> send email to my mailaddress 
 app.post("/reset/password/start", (req, res) => {
@@ -338,7 +320,7 @@ app.post("/reset/password/code", (req, res) => {
             if (code) {
                 hash(newpass) //
                     .then(newHashedPW => {
-                        console.log("hashedPW", newHashedPW); // put the PW in the database!! where email is ...
+                        console.log("newhashedPW", newHashedPW); // put the PW in the database!! where email is ...
                         db.updatePassword(mail, newHashedPW)
                             .then(result => {
                                 req.session.userId = result.rows[0].id;
@@ -372,9 +354,11 @@ app.get("/user", (req, res) => {
     // send the user data names id and the url!
     // console.log!!
     const userId = req.session.userId;
+    console.log("req.session.userId;", req.session.userId);
+
     db.getUserInfoById(userId)
         .then(result => {
-            console.log("result from getUserInfo", result);
+            console.log("result.rows from getUserInfo", result.rows);
             const userdata = result.rows[0];
             console.log("userdata", userdata);
             res.json({
@@ -442,11 +426,12 @@ app.get("/users/recent", (req, res) => {
         
 ////// USER SEARCH
 
-app.get("/users/search/:userId", (req, res) => {
+app.get("/users/search/:id", (req, res) => {
     console.log("req.session.userId", req.session.userId);
     // checck the data from the userinput
     // use params
-    const input = req.body.userInput;
+    console.log("params", req.params);
+    const input = req.params.id; // check the id
     db.findUsers(input).then((result) => {
         // this should return the list of users
         // console.log("result", result);
@@ -576,33 +561,33 @@ app.post("/end-friendship/:otherUserId", (req, res) => {
         });
 });
 
-
 //// Friends Wannabes Redux 
 // use otherUserId?
 
-app.get("/friends-wannabes", (req, res) => {
+app.post("/friends-wannabes", (req, res) => {
     const userId = req.session.userId;
+    console.log("made it into the friends wannabe", userId);
     // get the other users id
     db.getFriendsList(userId).then((data) => {
         console.log("data", data);
-        res.json({ data });
+        res.json({data});
     }).catch((err) => {
         console.log("error in retrieving the friendslist and wannabes!", err);
     });
 });
 
-
 ///// LOGOUT 
 
-app.get("/logout", (req, res) => {
+app.post("/logout", (req, res) => {
+    console.log("in the logout route!!!/ req.session", req.session);
     req.session = null; // new cookie-session
-    res.redirect("/welcome");
+    res.json({ success: true });
 });
 
 
 //// STAR ROUTE has to stay the last route
 
-app.get("*", function (req, res) {
+app.get("*", (req, res) => {
     
     if (req.session.userId) {
         res.sendFile(__dirname + "/index.html");
@@ -611,9 +596,9 @@ app.get("*", function (req, res) {
     }
 });
 
-// websocket io make server listen !
+// websocket io make server listen ! / before it was app.listen
 
-app.listen(8080, function() {
+server.listen(8080, () => {
     console.log("I'm listening.");
 });
 
@@ -625,3 +610,35 @@ io.on("connection", socket => {
     });
 });
 */
+
+// socket.request.session.userId is my socket request
+
+// all the socket code goes in here when someone connects (in io.on)
+
+io.on("connection", function (socket) {
+    if (!socket.request.session.userId) {
+        return socket.disconnect(true);
+    }
+
+    const socketUserId = socket.request.session.userId;
+
+    db.getLastTenMessages().then(data => {
+        console.log(data.rows);
+        // in here I WANT TO EMIT TO socket.js
+        //io.socket.emit("receiveChatMessages", data.rows);
+    });
+
+    socket.on("latestChatMessages", (messages) => {
+        console.log("this mssg is coming from the chat compo", messages);
+
+        console.log("user who send the message: ", socketUserId);
+
+        // do a db.query to store a new chat message in a new table!
+        // and get the user info (with a JOIN from two different tables)
+        // the object has to look like the object that we had before (to render it immediately)
+        // and then you have to emit the message object to everyone
+        // so everyone can see it in the chat container
+        //io.sockets.emit("latestChatMessages", messages);
+    });
+
+});

@@ -25,8 +25,7 @@ export default function ProfilePic({ first, last, imgUrl }) {
                             top: "6%",
                             transform: "translate(-90%, -5%)",
                             fontFamily: "Impact, Charcoal, sans-serif",
-                            borderStyle: "solid 2px",
-                            borderColor: "cornflowerblue",
+                            borderStyle: "solid 2px cornflowerblue"
                         }}
                     />
                 </a>

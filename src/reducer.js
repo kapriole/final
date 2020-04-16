@@ -60,3 +60,7 @@ export default function reducer(state = {}, action) {
 // check the IDs
 
 // useSelector?
+
+
+/// reducer sends the new copy of the state to redux
+

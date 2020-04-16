@@ -90,7 +90,7 @@ export default class Registration extends React.Component {
                 <button onClick={() => this.submit()}>register</button>
                 <p>
                     If you are a User <br></br>
-                    <a to="/login">Log in</a>
+                    <a href="/login">Log in</a>
                 </p>
             </div>
         );

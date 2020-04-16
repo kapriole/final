@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "./axios"; // is this right?
-import { HashRouter, Route } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 
 /// any place to link
 
@@ -13,57 +13,78 @@ export default class Registration extends React.Component {
         // react checks for changing states
         this.state = {};
     }
+    
     submit() {
+        console.log("made it axios login post route");
+
         axios
             .post("/login", {
+                token: "OH MY GLOB",
                 email: this.state.email,
-                pass: this.state.pass
+                pass: this.state.pass,
                 // what about the hashedpw?
             })
             .then(({ data }) => {
                 if (data.success) {
-                    // redirect to a page that is not welcome
-                    location.replace("/user"); // user? 
-                    // show a page for logged in users with the link to the reset password
-
+                // redirect to a page that is not welcome
+                    location.replace("/"); // user?
+                // show a page for logged in users with the link to the reset password
                 } else {
                     this.setState({
-                        error: true
+                        error: true,
                     });
                 }
+            }).catch(error => {
+                console.log("error in axios login post", error);
             });
     }
-    handlechange({ target }) {
+                                       
+    handleChange({ target }) {
         this.setState({
-            [target.name]: target.value
+            [target.name]: target.value,
         });
     }
+
     render() {
         return (
             <HashRouter>
                 <div>
                     {this.state.error && (
                         <div className="error">
-                            SORRY SOMETHINGS WRONG! TRY AGAIN
-                            <Link to="/login">Log in</Link>
+                            SORRY SOMETHINGS WRONG! TRY AGAIN!
+                            <br></br>
                         </div>
                     )}
-                    Email<br></br>
-                    <input name="email" onChange={e => this.handleChange(e)} />
-                    <br></br>
-                    Password<br></br>
-                    <input name="pass" onChange={e => this.handleChange(e)} />
+                    <form>
+                        Email<br></br>
+                        <input
+                            name="email"
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                        <br></br>
+                        Password
+                        <br></br>
+                        <input
+                            name="pass"
+                            type="password"
+                            onChange={(e) => this.handleChange(e)}
+                        />
+                    </form>
                     <br></br>
                     <br></br>
                     <button onClick={() => this.submit()}>login</button>
                     <p>
                         If you are not yet a User<br></br>
-                        <Link to="/register"> Register</Link>
+                        <Link to="/welcome#/register">Register</Link>
                         <br></br>or if u are one<br></br>
-                        <Link to="/reset/password/start">Reset Password</Link>
+                        <Link to="/welcome#/reset/password/start">
+                            Reset Password
+                        </Link>
                     </p>
                 </div>
             </HashRouter>
         );
-    }
+    }        
+                       
 }
+

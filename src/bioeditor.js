@@ -2,7 +2,7 @@ import React from 'react';
 import axios from './axios';
 
 export default class Bioeditor extends React.Component {
-                   constructor(props) {
+                constructor(props) {
                        super(props);
                        this.state = {
                            step: "changebio"
@@ -10,7 +10,7 @@ export default class Bioeditor extends React.Component {
                        console.log("props!", props);
     }
     
-
+    // track the  state of current bio and then make a conditional current 
 
                    // check if bio exists ! and put it in the step!
 
@@ -73,7 +73,7 @@ export default class Bioeditor extends React.Component {
                            return (
                                <div>
                                    <p>
-                                       Display my current bio in here:{" "}
+                                        Bio:  
                                        {this.state.bio}
                                    </p>
                                    <button
