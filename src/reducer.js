@@ -1,15 +1,13 @@
 // src/reducer.js
 
-// what do I need to import is it action file or type?
-
 export default function reducer(state = {}, action) {
     if (action.type == "RECEIVE_FRIENDS_WANNABES") {
         console.log("RECEIVE_FRIENDS_WANNABES");
         state = {
             ...state,
-            friendsWannabes: action.friendsWannabes,
+            friendsWannabes: action.friendsWannabes
         };
-        return state;
+        //return state;
     } 
 
     // user should be friends
@@ -17,14 +15,13 @@ export default function reducer(state = {}, action) {
     if (action.type == "ACCEPT_FRIEND_REQUEST") {
         console.log("ACCEPT_FRIEND_REQUEST");
         state = {
-            ...state, // clone global state // who is the user?
+            ...state, 
             friendsWannabes: state.friendsWannabes.map((user) => {
-                if (action.otherUserId === user.otherUserId) {
-                    // id of user who accepted request and is friend
+                if (action.otherUserId == user.otherUserId) { // why is one Id a string and the other not?
+                    // id of user who accepted request and is friend --> means that accepted is true
                     return {
                         ...user,
-                        // set one object in the friendwannabes to true (the one with the otherUserid)
-                        // ...user.otherUserId.accepted: true ??
+                        accepted: true
                     };
                 } else {
                     // runs for all the people who are not yet my friends
@@ -41,26 +38,42 @@ export default function reducer(state = {}, action) {
         state = {
             ...state, // clone global state // who is the user?
             friendsWannabes: state.friendsWannabes.map((user) => {
-                if (action.otherUserId === user.otherUserId) {
+                if (action.otherUserId == user.otherUserId) {
                     // id of user who accepted request and is friend
                     return {
                         ...user,
-                        // remove the user with the otherUserId 
-                        // from the array/ alter accepted ?
+                        accepted: false
                     };
                 } else {
-                    // runs for all the people who are not yet my friends
                     return user;
                 }
             }),
         };
     }
+
+    // chat
+
+    // get latest messages + the new one
+
+    if (action.type == "LATEST_CHAT_MESSAGES") {
+        console.log("LATEST_CHAT_MESSAGES");
+        state = {
+            ...state,
+            messages: action.messages// get the messages in here / reverse here or in backend?
+        };
+        console.log("stat in action latest chat messages", state);
+    }
+    
+/*
+    // send new message
+    
+    if (action.type == "SEND_MESSAGE") {
+        console.log("SEND_MESSAGE");
+        state = {
+            ...state, // clone global state // concat doesnt work?
+            messages: state.messages.concat(action.newMessage), // // add the newMessage to all messages arra / this happens in the back 
+        };
+    }
+*/
+    return state;
 }
-
-// check the IDs
-
-// useSelector?
-
-
-/// reducer sends the new copy of the state to redux
-

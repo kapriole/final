@@ -19,7 +19,6 @@ export default class Registration extends React.Component {
 
         axios
             .post("/login", {
-                token: "OH MY GLOB",
                 email: this.state.email,
                 pass: this.state.pass,
                 // what about the hashedpw?
@@ -75,9 +74,9 @@ export default class Registration extends React.Component {
                     <button onClick={() => this.submit()}>login</button>
                     <p>
                         If you are not yet a User<br></br>
-                        <Link to="/welcome#/register">Register</Link>
+                        <Link to="/register">Register</Link>
                         <br></br>or if u are one<br></br>
-                        <Link to="/welcome#/reset/password/start">
+                        <Link to="/password/start">
                             Reset Password
                         </Link>
                     </p>

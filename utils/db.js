@@ -64,7 +64,7 @@ module.exports.getUserInfoById = userId => {
 module.exports.updateUserCode = (secretCode, mail) => {
     const q = `
     INSERT code INTO passcodes 
-    WHERE users.email = $2
+    WHERE (users.email = $2)
     RETURNING *
     `;
     const params = [secretCode, mail];
@@ -77,7 +77,7 @@ module.exports.updateUserCode = (secretCode, mail) => {
 module.exports.getUserCode = (mail) => {
     const q = `
     SELECT code FROM passcodes 
-    WHERE users.email = $1
+    WHERE (users.email = $1)
     WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '10 minutes'
     RETURNING *
     `;
@@ -156,7 +156,7 @@ module.exports.getRecentUsers = () => {
 
 module.exports.findUsers = (input) => {
     return db.query(`
-    SELECT first FROM users WHERE first ILIKE $1`, 
+    SELECT first OR last FROM users WHERE first ILIKE $1`, 
     [input + '%']);
 };
 
@@ -211,7 +211,7 @@ module.exports.deleteFriendship = (userId, otherUserId) => {
 
 module.exports.getFriendsList = (userId) => {
     const q = `
-    SELECT (users.id, first, last, class, img_url, accepted)
+    SELECT users.id, first, last, class, img_url, accepted
     FROM friendships
     JOIN users
     ON (accepted = false AND receiver_id = $1 AND sender_id = users.id)
@@ -228,13 +228,27 @@ module.exports.getFriendsList = (userId) => {
 // I need info from users (first, last, class, image and chat text, timestamp) and chats
 // the most recent chat message at the bottom!
 
-module.exports.getLastTenMessages = (userId) => {
+// do I need user id?
+
+module.exports.getLastTenMessages = () => {
     const q = `
-    SELECT (users.id, first, last, class, img_url, chat.message_text, chat.created_at)
-    FROM users
-    JOIN chat
-    ON (sender_id = $1)
+    SELECT first, last, class, img_url, chat.id, chat.sender_id, chat.message_text, chat.created_at
+    FROM chat
+    JOIN users
+    ON (chat.sender_id = users.id)
+    ORDER BY chat.created_at DESC
+    LIMIT 10
     `;
-    const params = [userId];
+    return db.query(q);
+};
+
+module.exports.addMessage = (userId, newMessage) => {
+    const q = `
+    INSERT INTO chat 
+    (sender_id, message_text)
+    VALUES ($1, $2)
+    RETURNING *
+    `;
+    const params = [userId, newMessage];
     return db.query(q, params);
 };

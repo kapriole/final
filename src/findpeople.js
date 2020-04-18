@@ -37,6 +37,7 @@ export default function FindPeople() {
                 findUsers(data);
             }
         })();
+        
         return () => {
             // this will run on useEffect call that ran when "al" was typed in input field
             // in this function I can tell the useEffect that ran when "al" was typed in the input to stop any pending axios requests it has
@@ -66,29 +67,65 @@ export default function FindPeople() {
 
     // open the search field 
 
-    return (
-        <React.Fragment>
-            <div>
-                <h1>Recent Users</h1>
-                {recentUsers.map((recent) => {
-                    return (
-                        <div key={recent.id}>
-                            <Link to={`user/${recent.id}`}>
-                                <img src={recent.imgUrl}></img>
-                            </Link>
-                            <p>
-                                {recent.first} {recent.last}
-                            </p>
-                        </div>
-                    );
-                })}
-                <h1>Find other Users</h1>
-                <p>please find a user:</p>
-                <input
-                    onChange={handleChangeSearch}
-                    placeholder="enter a username"
-                />
-            </div>
-        </React.Fragment>
-    );
+    const searchResults = () => {
+        if (recentUsers) {
+            return (
+                <React.Fragment>
+                    <div>
+                        <h1>Recent Users</h1>
+                        {recentUsers.map((recent) => {
+                            return (
+                                <div key={recent.id}>
+                                    <Link to={`user/${recent.id}`}>
+                                        <img src={recent.imgUrl}></img>
+                                    </Link>
+                                    <p>
+                                        {recent.first} {recent.last}
+                                    </p>
+                                </div>
+                            );
+                        })}
+
+                        <h1>Find other Users</h1>
+                        <p>please find a user:</p>
+                        <input
+                            onChange={handleChangeSearch}
+                            placeholder="enter a username"
+                        />
+                    </div>
+                </React.Fragment>
+            );
+        } else if (users) {
+            return (
+                <React.Fragment>
+                    <div>
+                        <h1>Find someone</h1>
+                        <p>no matches</p>
+                        <input
+                            onChange={handleChangeSearch}
+                            placeholder="enter a username"
+                        />
+                        {users.map((user) => {
+                            return (
+                                <div key={user.id}>
+                                    <Link to={`user/${user.id}`}>
+                                        <img src={user.imgUrl}></img>
+                                    </Link>
+                                    <p>
+                                        {user.first} {user.last}
+                                    </p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </React.Fragment>
+            );
+
+
+        }
+
+    };
+
+    return searchResults();
+
 }

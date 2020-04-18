@@ -199,13 +199,13 @@ app.post("/register", function (req, res) {
 
 //////////////// LOGIN
 
-
+/*
 app.get("/login", (req, res) => {
     // user must be logged out and exist
     // then render the index.html
     res.sendFile(__dirname + "/index.html");
 });
-
+*/
 
 app.post("/login", (req, res) => {
     console.log("req.session", req.session);
@@ -232,10 +232,12 @@ app.post("/login", (req, res) => {
                 })
                 .catch((error) => {
                     console.log("err in matchvalue ", error);
+                    res.json({ success: false });
                 });
         })
         .catch((error) => {
             console.log("err in getUserLogin: ", error);
+            res.json({ success: false });
         });
 });
 
@@ -277,7 +279,9 @@ app.post("/reset/password/start", (req, res) => {
             // generate secret code and save it in the DB !!
             // if user mail exists ( create the secretuserCode and Update the db)
             // generate before db query? or where?
-            db.updateUserCode(secretCode, mail);
+            db.updateUserCode(secretCode, mail).then(result => {
+                console.log("result", result);
+            }).catch(error => { console.log("error in saving the result", error);});
             // save it to the DB
             // and send the mail directly from here (bc I already have the right mail + code)
             ses.sendEmail(
@@ -300,11 +304,10 @@ app.post("/reset/password/start", (req, res) => {
                         err
                     );
                 })
-
                 .catch(error => {
                     console.log("err in Match : ", error);
                 });
-        });
+        }).catch(error => { console.log("error in et User by email", error);});
 });
 
 app.post("/reset/password/code", (req, res) => {
@@ -406,14 +409,14 @@ app.get("/users/recent", (req, res) => {
     db.getRecentUsers()
         .then((result) => {
             console.log("result from getRecentUsers", result);
-            const userdata = result.rows[0];
+            const userdata = result.rows;
             console.log("userdata", userdata);
             res.json({
                 userId: userdata.id,
                 first: userdata.first,
                 last: userdata.last,
                 element: userdata.class,
-                imgUrl: userdata.url,
+                imgUrl: userdata.img_url,
                 bio: userdata.bio,
                 timestamp: userdata.created_at,
             });
@@ -564,13 +567,13 @@ app.post("/end-friendship/:otherUserId", (req, res) => {
 //// Friends Wannabes Redux 
 // use otherUserId?
 
-app.post("/friends-wannabes", (req, res) => {
+app.get("/friends-wannabes", (req, res) => {
     const userId = req.session.userId;
     console.log("made it into the friends wannabe", userId);
     // get the other users id
     db.getFriendsList(userId).then((data) => {
-        console.log("data", data);
-        res.json({data});
+        console.log("data in friends rows", data.rows);
+        res.json( data.rows );
     }).catch((err) => {
         console.log("error in retrieving the friendslist and wannabes!", err);
     });
@@ -602,43 +605,88 @@ server.listen(8080, () => {
     console.log("I'm listening.");
 });
 
-/* 
+//// connection is established
+
 io.on("connection", socket => {
     console.log(`a socket with the id ${socket.id} just connected`);
     socket.on("disconnet", ()=> {
         console.log(`a socket with the id ${socket.id} just disconnected`);
     });
 });
-*/
 
 // socket.request.session.userId is my socket request
 
 // all the socket code goes in here when someone connects (in io.on)
 
-io.on("connection", function (socket) {
+io.on("connection", socket => {
     if (!socket.request.session.userId) {
         return socket.disconnect(true);
     }
 
     const socketUserId = socket.request.session.userId;
 
-    db.getLastTenMessages().then(data => {
-        console.log(data.rows);
-        // in here I WANT TO EMIT TO socket.js
-        //io.socket.emit("receiveChatMessages", data.rows);
+    /////// socket on  get last 10 messages
+    /// get the messages from db by id (and then show the user info)
+
+    db.getLastTenMessages()
+        .then((data) => {
+            console.log("these are my latest chat messages", data.rows);
+            // in here I WANT TO EMIT TO socket.js
+            let messages = data.rows.reverse(); // check the order of the rows
+            io.emit("latestChatMessages", messages);
+        })
+        .catch((error) => {
+            console.log("erooro in get latest messages", error);
+        });
+
+    /// find better descriptions
+
+    /////// socket on send new message
+    /// get the messages again after adding the new message!
+
+    socket.on("sendMessage", (newMessage) => {
+        console.log("this mssg is coming from the chat compo", newMessage);
+        console.log("user who sent the message: ", socketUserId);
+
+        db.addMessage(socketUserId, newMessage)
+            .then(() => {
+                db.getLastTenMessages()
+                    .then((data) => {
+                        let messages = data.rows;
+                        io.emit("latestChatMessages", messages);
+                    })
+                    .catch((error) => {
+                        console.log(
+                            "erooro in get latest messages plus new message",
+                            error
+                        );
+                    });
+            })
+            .catch((error) => {
+                console.log("erooro in send messages", error);
+            });
+
+        //// chatMessage event must be emitted to all the sockets ...
     });
 
-    socket.on("latestChatMessages", (messages) => {
-        console.log("this mssg is coming from the chat compo", messages);
-
+    /*
+    // this will be the new message that appears when someone postet one 
+    socket.on("getMessage", (newMessage) => {
+        console.log("this mssg is coming from the chat compo", newMessage);
         console.log("user who send the message: ", socketUserId);
 
-        // do a db.query to store a new chat message in a new table!
-        // and get the user info (with a JOIN from two different tables)
-        // the object has to look like the object that we had before (to render it immediately)
-        // and then you have to emit the message object to everyone
-        // so everyone can see it in the chat container
-        //io.sockets.emit("latestChatMessages", messages);
+        db.saveNewMessage(socketUserId, newMessage).then((data) => {
+            console.log(data.rows);
+            // in here I WANT TO EMIT TO socket.js
+            io.socket.emit("sendMessage", data.rows); // doesnt work with sockets
+        });
+    });
+    
+    socket.on("latestChatMessages", (messages) => {
+        console.log("this mssg is coming from the chat compo", messages);
+        console.log("user who send the message: ", socketUserId);
+    
     });
 
+*/
 });

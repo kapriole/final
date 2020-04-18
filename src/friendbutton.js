@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axios";
+import axios from "./axios";
 
 // import Other Profile?
 
@@ -35,7 +35,7 @@ export default function FriendButton(props) {
                         setButtonText("Accept Friend Request");
                     }
                 } else {
-                    setButtonText("End Friend Request");
+                    setButtonText("End Friendship");
                 }
                 // update button text // depending on the result from axios
                 // set the buttonText depending on the user's id

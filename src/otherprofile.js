@@ -1,8 +1,7 @@
-
 import React from "react";
 import axios from "./axios"; 
 import Presentational from "./presentational";
-import FriendButton from "./hooks/friendbutton";
+import FriendButton from "./friendbutton";
 
 export default class OtherProfile extends React.Component {
     constructor(props) {
@@ -23,6 +22,7 @@ export default class OtherProfile extends React.Component {
                         otherUserId: data.data.id, // check otherUderId
                         first: data.data.first,
                         last: data.data.last,
+                        mail: data.data.email, /// just to test / get the email / remove later
                         element: data.data.class,
                         imgUrl: data.data.img_url,
                         bio: data.data.bio

@@ -7,8 +7,8 @@ import Profile from "./profile";
 import ProfilePic from "./profilepic";
 import OtherProfile from "./otherprofile";
 import FindPeople from "./findpeople";
-import Friends from "./hooks/friends";
-import Chat from "./hooks/chat";
+import Friends from "./friends";
+import Chat from "./chat";
 import Logout from "./logout";
 
 // import styled from "styled-components";
@@ -17,6 +17,7 @@ export default class App extends React.Component {
     constructor() {
         super();
         this.state = {
+            uploaderIsVisible: false
         };
         this.myImgUrl = this.myImgUrl.bind(this);
         this.setBio = this.setBio.bind(this);
@@ -59,7 +60,8 @@ export default class App extends React.Component {
         console.log(" imageUpload worked / works!");
         this.setState({
             imgUrl: newImgUrl,
-            uploaderIsVisible: !this.state.uploaderIsVisible});
+            uploaderIsVisible: !this.state.uploaderIsVisible
+        });
     }
 
     render() {
@@ -85,19 +87,19 @@ export default class App extends React.Component {
                                 marginRight: "20px",
                             }}
                         >
-                            <Link to="/users/search" component={FindPeople}>
+                            <Link to="/users/search">
                                 Find Users
                             </Link>
                             <br></br>
-                            <Link to="/chat" component={Chat}>
+                            <Link to="/chat">
                                 Chat
                             </Link>
                             <br></br>
-                            <Link to="/friends" component={Friends}>
+                            <Link to="/friends" >
                                 Friends
                             </Link>
                             <br></br>
-                            <Link to="/logout" component={Logout}>
+                            <Link to="/logout">
                                 Logout
                             </Link>
                             <br></br>
@@ -137,7 +139,6 @@ export default class App extends React.Component {
                                 <Uploader
                                     myImgUrl={this.myImgUrl}
                                     onClick={this.toggleModal}
-                                    uploaderIsVisible={false}
                                 />
                             )}
                             <Route
@@ -164,9 +165,23 @@ export default class App extends React.Component {
                                 )}
                             />
                             <Route
-                                path="/friends/:id"
+                                direct path="/friends"
+                                component={Friends}
+                            />
+                            <Route
+                                path="/chat"
                                 render={(props) => (
-                                    <Friends
+                                    <Chat
+                                        key={props.match.url}
+                                        match={props.match}
+                                        history={props.history}
+                                    />
+                                )}
+                            />
+                            <Route
+                                path="/logout"
+                                render={(props) => (
+                                    <Logout
                                         key={props.match.url}
                                         match={props.match}
                                         history={props.history}
@@ -174,7 +189,6 @@ export default class App extends React.Component {
                                     />
                                 )}
                             />
-                            <Route path="/chat" component={Chat} />
                         </div>
                     </div>
                 </BrowserRouter>

@@ -18,7 +18,8 @@ export default class Uploader extends React.Component {
         });
     }
    
-    uploadImage() {
+    uploadImage(e) {
+        e.preventDefault();
         console.log("uploade image in uploader");
         var formData = new FormData();
         // this props! 
@@ -53,7 +54,7 @@ export default class Uploader extends React.Component {
                     name="file"
                     accept="image/*"
                 />
-                <button onClick={() => this.uploadImage()}>
+                <button onClick={(e) => this.uploadImage(e)}>
                     Upload New Image!
                 </button>
                

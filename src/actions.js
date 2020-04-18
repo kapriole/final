@@ -1,82 +1,57 @@
-// src/actions.js
-
 import axios from "./axios";
-
-// get the other
 
 // data is an object that comes back from wannabes
 
-export function receiveFriendsWannabes() {
-    axios
-        .get("/friends-wannabes")
-        .then(({ data } ) => {
-            console.log("data from wannabes axios get", data);
-            // const friends = data.friendsWannabes;
-            // the data will contain a list with all the wannabes and friends
-            // here we get the object with (object.type and object.friendsWannabes = [array of friends and wannabes from the server]
-            // get the array and add it to the object
-            // how can I check if the array is empty?
-        })
-        .catch((error) => {
-            console.log("error from wannabes axios", error);
-        });
-    return {
-        type: "RECEIVE_FRIENDS_WANNABES",
-        friendsWannabes: data // is the array with everything // make some friends and check the array // why is data not defined?
-    };
-}
+export async function receiveFriendsWannabes() {
+           console.log("Im in the axios receive friendwannabes");
 
-export function acceptFriendRequest(otherUserId) {
-    axios
-        .post("/add-friendship/" + otherUserId)
-        .then((data) => {
-            console.log("data from accept friendship axios post", data);
-            // here we get the object with (object.type and object.otherUserId = id of the user whose friendship was ACCEPTED)
-        })
-        .catch((error) => {
-            console.log("error from acceptFriendship axios post", error);
-        });
+           const { data } = await axios.get("/friends-wannabes"); // why can't I get my data from the server?
+           return {
+               type: "RECEIVE_FRIENDS_WANNABES",
+               friendsWannabes: data, // is the array with everything // make some friends and check the array // why is data not defined? // bc I have no friends :D
+           };
+           // catch error
+       }
+
+export async function acceptFriendRequest(otherUserId) {
+    
+    console.log("data from accept friendship axios post");
+
+    const { data } = await axios.post("/add-friendship/" + otherUserId);
     return {
         type: "ACCEPT-FRIENDSHIP",
         otherUserId // id of the user whose friendship was accepted
     };
 }
 
-export function unfriend(otherUserId) {
-    axios
-        .post("/end-friendship/" + otherUserId)
-        .then((data) => {
-            console.log("data from end friendship axios post", data);
-        })
-        .catch((error) => {
-            console.log("error from end Friendship axios post", error);
-        });
+export async function unfriend(otherUserId) {
+
+    console.log("data from end friendship axios post");
+
+    const { data } = await axios.post("/end-friendship/" + otherUserId);
     return {
         type: "UNFRIEND",
         otherUserId // id of the user whose friendship was ended
     };
 }
 
-// The object it returns is the action
 
-// in here comes the ten last chat messages
-
-// the the latest chat message
-
-
-export function latestChatMessages(socketUserId) {
-    // get  it from the socket.js /  the websocket
+export async function latestChatMessages(messages) {
+    console.log("data latest messages in axios post", messages);
+    // get  it from the socket.js /  the websocket with await
     return {
-        type: "GET_LATEST_MESSAGES",
-        socketUserId // id of the user whose friendship was ended
+        type: "LATEST_CHAT_MESSAGES",
+        messages // add latest message in here
     };
 }
 
 
-export function addChatMessage(userId) {
-    // get  it from the socket.js /  the websocket
+export async function sendMessage(newMessage) {
+    console.log("data send message axios post", newMessage);
+
+    // get  it from the socket.js /  the websocket  with await
     return {
-        type: "ADD_MESSAGE",
-        userId // id of the user whose friendship was ended
+        type: "SEND_MESSAGE",
+        newMessage
     };
 }
