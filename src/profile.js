@@ -24,7 +24,7 @@ const HoverText = styled.p`
 `;
 
 
-export default function Profile({ first, last, element, imgUrl, bio, setBio, toggleModal }) {
+export default function Profile({ first, last, element, imgUrl, bio, setBio, toggleModal}) {
     let ImgUrl = imgUrl || "./images/default.png";
     let alt = `${first} ${last}`;
 

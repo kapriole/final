@@ -17,7 +17,7 @@ export default function reducer(state = {}, action) {
         state = {
             ...state, 
             friendsWannabes: state.friendsWannabes.map((user) => {
-                if (action.otherUserId == user.otherUserId) { // why is one Id a string and the other not?
+                if (action.otherUserId == user.id) { // why is one Id a string and the other not?
                     // id of user who accepted request and is friend --> means that accepted is true
                     return {
                         ...user,
@@ -38,7 +38,7 @@ export default function reducer(state = {}, action) {
         state = {
             ...state, // clone global state // who is the user?
             friendsWannabes: state.friendsWannabes.map((user) => {
-                if (action.otherUserId == user.otherUserId) {
+                if (action.otherUserId == user.id) {
                     // id of user who accepted request and is friend
                     return {
                         ...user,
@@ -59,7 +59,7 @@ export default function reducer(state = {}, action) {
         console.log("LATEST_CHAT_MESSAGES");
         state = {
             ...state,
-            messages: action.messages// get the messages in here / reverse here or in backend?
+            messages: action.messages.reverse()// get the messages in here / reverse here
         };
         console.log("stat in action latest chat messages", state);
     }

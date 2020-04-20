@@ -5,7 +5,7 @@ export default class Bioeditor extends React.Component {
                 constructor(props) {
                        super(props);
                        this.state = {
-                           step: "changebio"
+                           step: null
                        };
                        console.log("props!", props);
     }
@@ -57,7 +57,27 @@ export default class Bioeditor extends React.Component {
                    render() {
                        console.log("this.state", this.state);
                        const step = this.state.step;
-                       if (step == "nobio") {
+                       if (step == null) {
+                           return (
+                                                 <div>
+                                                     <p>
+                                                         No Bio Yet
+                                                     </p>
+                                                     <button
+                                                         onClick={() =>
+                                                             this.setState({
+                                                                 step:
+                                                                     "changebio",
+                                                             })
+                                                         }
+                                                     >
+                                                        Add my Lifestory
+                                                     </button>
+                                                 </div>
+                                             );
+                          
+                      }
+                      else if (step == "nobio") {
                            return (
                                <div>
                                    <button

@@ -46,9 +46,7 @@ export default class OtherProfile extends React.Component {
                     />
                     <br></br> Element: {this.state.element}
                     <br></br> <br></br>
-                    <p value={this.state.bio}>
-                        This should show the users bio/ if no bio show nobio
-                    </p>
+                    {this.state.bio && (<p> My Bio: {this.state.bio}</p>)}
                     <FriendButton
                         userId={this.props.userId}
                         otherUserId={this.props.match.params.id}
@@ -57,9 +55,7 @@ export default class OtherProfile extends React.Component {
             </React.Fragment>
         );
     }
-            
 }
-
 // props is passed to set state?
 
 // here you can get the otherProfileUsers Id and pass it as a prop to the FriendButton

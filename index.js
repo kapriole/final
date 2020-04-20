@@ -125,9 +125,9 @@ if (process.env.NODE_ENV != "production") {
 //// the beginning
 
 app.get("/", function (req, res) {
-    console.log("req.body", req.body);
-    console.log("req.session", req.session);   
-    console.log("req.session", req.session);
+    //console.log("req.body", req.body);
+    //console.log("req.session", req.session);   
+    //console.log("req.session", req.session);
     if (req.session.userId) {
         res.sendFile(__dirname + "/index.html");
     } else {
@@ -218,10 +218,10 @@ app.post("/login", (req, res) => {
 
     db.getUserLogin(mail)
         .then((result) => {
-            console.log("result", result);
-            console.log("result.rows", result.rows);
+            //console.log("result", result);
+            //console.log("result.rows", result.rows);
             const hashfromDB = result.rows[0].pass;
-            console.log("haschfromdb", hashfromDB);
+            //console.log("haschfromdb", hashfromDB);
             compare(password, hashfromDB)
                 .then((matchedValue) => {
                     if (matchedValue) {
@@ -265,78 +265,74 @@ app.post("/test-email", (req, res) => {
 /// I forgot my password --> send email to my mailaddress 
 app.post("/reset/password/start", (req, res) => {
     // console log
+    console.log("req", req.body);
+
+    console.log("req.query", req.query);
+    console.log("req.body", req.body);
+
     const mail = req.body.email;
+    console.log("req.query.email", req.body.email);
     // confirm there is a user with the submitted mail adress!
     db.getUser(mail)
         .then(result => {
-            console.log("result", result);
-            console.log("result.rows", result.rows);
-            // check if user with this email exists
-            console.log("result.rows[0].email", result.rows[0].email);
+            console.log("result.rows.email", result.rows[0].email);
             console.log("email exists in DB");
-            // catch the error if the email doesnt exist!
-            // send result / confirm the user exists and direct user to the next page
-            // generate secret code and save it in the DB !!
-            // if user mail exists ( create the secretuserCode and Update the db)
-            // generate before db query? or where?
-            db.updateUserCode(secretCode, mail).then(result => {
-                console.log("result", result);
-            }).catch(error => { console.log("error in saving the result", error);});
+            // when the user exists then update the code ...
+            const mail = result.rows[0].email;
+            console.log("secretcode", secretCode);
+            db.updateUserCode(mail, secretCode).then(result => {
+                console.log("im in the secret code secion/result rows", result.rows[0]);
+
+            }).catch(error => { console.log("error", error);});
             // save it to the DB
-            // and send the mail directly from here (bc I already have the right mail + code)
             ses.sendEmail(
                 "hologramm@posteo.de", // mail // put my slack email in here
                 "This is your Reset Code!",
                 "Please reset you password during the next 10 min with this Code: " +
-                    secretCode // invalid csurf secret
-            )
-                .then(() => {
-                    // everything worked!
-                    res.json({ success: true });
-                    // render two form fields for code and resetpw
-                    console.log("it worked!");
-                    // res.redirect("/reset/entercode"); we dont do redirect
-                })
-                .catch(err => {
-                    res.json({ success: false });
-                    console.log(
-                        "something went wrong in sending the mail!",
-                        err
-                    );
-                })
-                .catch(error => {
-                    console.log("err in Match : ", error);
-                });
-        }).catch(error => { console.log("error in et User by email", error);});
+                secretCode // invalid csurf secret
+            );
+            console.log("ses send email is happening ?");
+
+            res.json({ success: true });
+            // render two form fields for code and resetpw
+            console.log("it worked!");
+        })
+        .catch(error => { console.log("error in get User by email", error); });
 });
 
 app.post("/reset/password/code", (req, res) => {
     const code = req.body.code;
     const newpass = req.body.newpass;
     const mail = req.body.email;
-
+    console.log("im in the rest pw route");
     // confirm there is a user with the submitted mail adress!
     // check if the entered code exists
+
     db.getUserCode(mail)
         .then(result => {
-            console.log("whats the code the user code ", result);
+            console.log("whats the code the user code ", result.rows[0].code);
+            //const tableCode = result.rows[0].code;
+            console.log("code", code);
+            // when the code exists 
             if (code) {
+                console.log("newpass", newpass);
                 hash(newpass) //
-                    .then(newHashedPW => {
+                    .then((newHashedPW) => {
                         console.log("newhashedPW", newHashedPW); // put the PW in the database!! where email is ...
+                        console.log("mail", mail);
                         db.updatePassword(mail, newHashedPW)
-                            .then(result => {
+                            .then((result) => {
                                 req.session.userId = result.rows[0].id;
                                 // res.sendFile(__dirname + "/index.html");
                                 // add conditional rendering to the index file
                                 res.json({ success: true });
                             })
-                            .catch(error => {
+                            .catch((error) => {
                                 console.log("error in update PW", error);
                                 res.json({ success: false });
                             });
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         console.log("err in code doenst exist", err);
                         res.json({ success: false });
                     });
@@ -361,13 +357,14 @@ app.get("/user", (req, res) => {
 
     db.getUserInfoById(userId)
         .then(result => {
-            console.log("result.rows from getUserInfo", result.rows);
+            //console.log("result.rows from getUserInfo", result.rows);
             const userdata = result.rows[0];
             console.log("userdata", userdata);
             res.json({
                 userId: userdata.id,
                 first: userdata.first, 
                 last: userdata.last,
+                email: userdata.email,
                 element: userdata.class,
                 imgUrl: userdata.img_url,
                 bio: userdata.bio
@@ -391,7 +388,7 @@ app.get("/user/:id.json", (req, res) => {
     const userId = req.params.id; // is other User Id
     db.getUserInfoById(userId)
         .then(({rows}) => {
-            console.log("result from getUserInfo", rows);
+            //console.log("result from getUserInfo", rows);
             res.json(rows[0] || { redirect: "/"});
         })
         .catch(err => {
@@ -404,22 +401,12 @@ app.get("/user/:id.json", (req, res) => {
 ///// get recent users
 
 app.get("/users/recent", (req, res) => {
-    // console.log("req.session", req.session);
-    // FIND the users who signed up most recently
     db.getRecentUsers()
         .then((result) => {
-            console.log("result from getRecentUsers", result);
+            //console.log("result from getRecentUsers", result);
             const userdata = result.rows;
-            console.log("userdata", userdata);
-            res.json({
-                userId: userdata.id,
-                first: userdata.first,
-                last: userdata.last,
-                element: userdata.class,
-                imgUrl: userdata.img_url,
-                bio: userdata.bio,
-                timestamp: userdata.created_at,
-            });
+            //console.log("userdata", userdata);
+            res.json(userdata); // cannot be an object
         })
         .catch((err) => {
             console.log("something wrong in get userdata", err);
@@ -429,16 +416,16 @@ app.get("/users/recent", (req, res) => {
         
 ////// USER SEARCH
 
-app.get("/users/search/:id", (req, res) => {
-    console.log("req.session.userId", req.session.userId);
-    // checck the data from the userinput
-    // use params
-    console.log("params", req.params);
-    const input = req.params.id; // check the id
+app.get("/users/search/", (req, res) => {
+    console.log("req.query", req.query);
+    // use query (q)
+    const input = req.query.q; // check the query
+    console.log("input", input);
     db.findUsers(input).then((result) => {
         // this should return the list of users
-        // console.log("result", result);
-        res.json({ result });
+        console.log("result.rows", result.rows);
+        const userdata = result.rows;
+        res.json( userdata );
     }).catch(err => {
         console.log("error in find Users", err);
     });
@@ -584,6 +571,8 @@ app.get("/friends-wannabes", (req, res) => {
 app.post("/logout", (req, res) => {
     console.log("in the logout route!!!/ req.session", req.session);
     req.session = null; // new cookie-session
+    console.log("in the logout route!!!/ req.session", req.session);
+
     res.json({ success: true });
 });
 
@@ -630,9 +619,9 @@ io.on("connection", socket => {
 
     db.getLastTenMessages()
         .then((data) => {
-            console.log("these are my latest chat messages", data.rows);
+            //console.log("these are my latest chat messages", data.rows);
             // in here I WANT TO EMIT TO socket.js
-            let messages = data.rows.reverse(); // check the order of the rows
+            let messages = data.rows; //reverse(); // check the order of the rows
             io.emit("latestChatMessages", messages);
         })
         .catch((error) => {

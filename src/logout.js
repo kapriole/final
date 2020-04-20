@@ -2,7 +2,7 @@
 
 import React from "react";
 import axios from "./axios";
-import { HashRouter, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 /// any place to link
 
@@ -52,7 +52,7 @@ export default class Logout extends React.Component {
 
     render() {
         return (
-            <HashRouter>
+            <React.Fragment>
                 <div>
                     {this.state.error && (
                         <div className="error">
@@ -62,14 +62,16 @@ export default class Logout extends React.Component {
                     )}
                     {this.state.loggedOut && (
                         <div className="loggedOut">
-                            <Link to="/login"></Link>
+                            <p>Thanks for coming by!</p>
+                            <Link to="/welcome#/">Go back to Welcome</Link>
                             <br></br>
                         </div>
                     )}
                 </div>
-            </HashRouter>
+            </React.Fragment>
         );
     }        
                        
 }
 
+// reload page!

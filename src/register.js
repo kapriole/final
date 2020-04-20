@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "./axios";
+import { Link } from "react-router-dom";
 
 /// any place to link
 
@@ -90,7 +91,7 @@ export default class Registration extends React.Component {
                 <button onClick={() => this.submit()}>register</button>
                 <p>
                     If you are a User <br></br>
-                    <a href="/login">Log in</a>
+                    <Link to="/login">Log in</Link>
                 </p>
             </div>
         );

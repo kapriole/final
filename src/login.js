@@ -1,10 +1,9 @@
 import React from "react";
 import axios from "./axios"; // is this right?
-import { HashRouter } from "react-router-dom";
 
 /// any place to link
 
-import { Link } from "react-router-dom"; // is this right?
+import { Link } from "react-router-dom"; 
 
 export default class Registration extends React.Component {
     constructor(props) {
@@ -46,7 +45,6 @@ export default class Registration extends React.Component {
 
     render() {
         return (
-            <HashRouter>
                 <div>
                     {this.state.error && (
                         <div className="error">
@@ -76,12 +74,10 @@ export default class Registration extends React.Component {
                         If you are not yet a User<br></br>
                         <Link to="/register">Register</Link>
                         <br></br>or if u are one<br></br>
-                        <Link to="/password/start">
-                            Reset Password
-                        </Link>
+                        <Link to="/reset/password/start">Reset Password</Link>
                     </p>
                 </div>
-            </HashRouter>
+     
         );
     }        
                        

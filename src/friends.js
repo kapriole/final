@@ -2,26 +2,25 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { receiveFriendsWannabes, acceptFriendRequest, unfriend } from "./actions";
+import {
+    receiveFriendsWannabes,
+    acceptFriendRequest,
+    unfriend,
+} from "./actions";
 
 export default function Friends() {
-
     const dispatch = useDispatch();
 
-
-    const friendsWannabes = useSelector((state) =>
+    const friendsWannabes = useSelector(
+        (state) =>
             state.friendsWannabes &&
             state.friendsWannabes.filter((user) => user.accepted == false)
-        );
-    
+    );
 
     const trueFriends = useSelector(
         (state) =>
             state.friendsWannabes &&
-            state.friendsWannabes.filter(
-                (user) => user.accepted == true
-            )
-                      
+            state.friendsWannabes.filter((user) => user.accepted == true)
     );
 
     useEffect(() => {
@@ -47,20 +46,35 @@ export default function Friends() {
                 )}
 
                 {friendsWannabes &&
-                    friendsWannabes.map((user) => {
+                    friendsWannabes.map((user, index) => {
                         return (
-                            <div key={user.otherUserId} className="friendslist">
-                                <img width="150" src={user.img_url} />
+                            <div key={index} className="friendslist">
+                                <Link to={`user/${user.id}`}>
+                                    <div
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <img
+                                            width="100px"
+                                            src={user.img_url || user.imgUrl}
+                                        ></img>
+                                    </div>
+                                </Link>
                                 <p>
-                                    {user.first} {user.last}
+                                    {user.first} {user.last} <br></br> Element:
+                                    {user.class}
                                 </p>
+                                <br></br>
+                                <p>wants to be your friend ...</p>
+                                <br></br>
                                 <div className="wannabes">
                                     <button
                                         onClick={() =>
                                             dispatch(
-                                                acceptFriendRequest(
-                                                    user.otherUserId
-                                                )
+                                                acceptFriendRequest(user.id)
                                             )
                                         }
                                     >
@@ -73,17 +87,30 @@ export default function Friends() {
                 <br></br>
 
                 {trueFriends &&
-                    trueFriends.map((user) => {
+                    trueFriends.map((user, index) => {
                         return (
-                            <div key={user.otherUserId} className="friendslist">
-                                <img src={user.img_url} />
+                            <div key={index} className="friendslist">
+                                <Link to={`user/${user.id}`}>
+                                    <div
+                                        style={{
+                                            width: "100px",
+                                            height: "100px",
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <img
+                                            width="100px"
+                                            src={user.img_url || user.imgUrl}
+                                        ></img>
+                                    </div>
+                                </Link>
                                 <p>
-                                    {user.first} {user.last}
+                                    {user.first} {user.last} <br></br> Element: {user.class}
                                 </p>
                                 <div className="friends">
                                     <button
                                         onClick={() =>
-                                            dispatch(unfriend(user.otherUserId))
+                                            dispatch(unfriend(user.id))
                                         }
                                     >
                                         end friendship
@@ -94,17 +121,7 @@ export default function Friends() {
                     })}
                 <br></br>
 
-                <nav>
-                    <Link to="/friends">See who is friends with you</Link>
-                    <br></br>
-                    <br></br>
-                    <Link to="/wannabes">See who wants to be friends</Link>
-                </nav>
             </div>
         </React.Fragment>
     );
 }
-
-
-
-    

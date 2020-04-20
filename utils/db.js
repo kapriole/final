@@ -31,17 +31,17 @@ module.exports.getUserLogin = (mail) => {
 
 //// FIND USER BY MAIL
 
-module.exports.getUser = mail => {
+module.exports.getUser = (mail) => {
     const q = `
     SELECT  
-    users.id
-    users.first,
-    users.last,
-    users.class,
-    users.email,
-    users.pass,
+    id,
+    first,
+    last,
+    class,
+    email,
+    pass
     FROM users
-    RETURNING *
+    WHERE email = $1
     `;
     const params = [mail];
     return db.query(q, params);
@@ -52,7 +52,7 @@ module.exports.getUser = mail => {
 module.exports.getUserInfoById = userId => {
     const q = `
         SELECT * FROM users
-        WHERE users.id = $1
+        WHERE (users.id = $1)
     `;
     const params = [userId];
     return db.query(q, params);
@@ -61,13 +61,12 @@ module.exports.getUserInfoById = userId => {
 // updateUserCode
 // INSERT NEW CODE
 
-module.exports.updateUserCode = (secretCode, mail) => {
+module.exports.updateUserCode = (mail, secretCode) => {
     const q = `
-    INSERT code INTO passcodes 
-    WHERE (users.email = $2)
-    RETURNING *
+    INSERT INTO passcodes (email, code)
+    VALUES ($1, $2)
     `;
-    const params = [secretCode, mail];
+    const params = [ mail, secretCode];
     return db.query(q, params);
 };
 
@@ -77,9 +76,7 @@ module.exports.updateUserCode = (secretCode, mail) => {
 module.exports.getUserCode = (mail) => {
     const q = `
     SELECT code FROM passcodes 
-    WHERE (users.email = $1)
-    WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '10 minutes'
-    RETURNING *
+    WHERE email = $1 AND created_at > CURRENT_TIMESTAMP - INTERVAL '10 minutes'
     `;
     const params = [mail];
     return db.query(q, params);
@@ -93,9 +90,9 @@ module.exports.getUserCode = (mail) => {
 
 module.exports.updatePassword = (mail, newHashedPW) => {
     const q = `
-        INSERT into users (email, pass)
-        VALUES ($1, $2)
-        DO UPDATE SET pass = $2
+        UPDATE users
+        SET pass = $2
+        WHERE email = $1
         RETURNING *
     `;
     const params = [mail, newHashedPW]; // do I have to use the hashedPW?
@@ -148,7 +145,7 @@ module.exports.updateBio = (userId, bio) => {
 module.exports.getRecentUsers = () => {
     const q = `
         SELECT * FROM users
-        WHERE CURRENT_TIMESTAMP - created_at < INTERVAL '1000 minutes'
+        ORDER BY created_at DESC
         LIMIT 3
     `;
     return db.query(q);
@@ -156,7 +153,7 @@ module.exports.getRecentUsers = () => {
 
 module.exports.findUsers = (input) => {
     return db.query(`
-    SELECT first OR last FROM users WHERE first ILIKE $1`, 
+    SELECT id, first, last, img_url FROM users WHERE first ILIKE $1`, 
     [input + '%']);
 };
 

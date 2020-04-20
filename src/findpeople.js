@@ -1,131 +1,151 @@
-import React, { useState, useEffect, Link } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "./axios";
 
 // get the users array form ajax
  
 export default function FindPeople() {
+    
+    console.log("im in the find/people route");
     const [recentUsers, displayRecentUsers] = useState([]);
-    const [users, findUsers] = useState([]);
 
     useEffect(() => {
         console.log("useEffect of displayRecentUsers");
-        let ignore = false;
-        (async () => {
-            const { data } = await axios.get(`/users/recent`);
-            if (!ignore) {
+        axios
+            .get("/users/recent")
+            .then(({ data }) => {
+                console.log("data in recent users", data);
                 displayRecentUsers(data);
-            }
-        })();
-        return () => {
-            ignore = true;
-            console.log("displayRecentUsers clean up function");
-        };
-    }, [recentUsers]); // end useEffect
+            })
+            .catch((error) => {
+                console.log("error in useEffect get redent users", error);
+            });
+    }, []);
 
-    console.log("recetnusers", recentUsers);
+    // error handling??
+
+    console.log("recentUsers", recentUsers);
 
     // if user types alb into the input field
     // get the value from the search field! 
     // userInput
 
-    useEffect(() => {
-        console.log("useEffect of findUsers");
-        let ignore = false;
-        (async () => {
-            const { data } = await axios.get(`/users/search/${users}`);
-            if (!ignore) {
-                findUsers(data);
-            }
-        })();
-        
-        return () => {
-            // this will run on useEffect call that ran when "al" was typed in input field
-            // in this function I can tell the useEffect that ran when "al" was typed in the input to stop any pending axios requests it has
-            ignore = true;
-            console.log("findUsers clean up function");
-        };
-    }, [users]); // end useEffect
+    // I dont need to filter here because it's filtered in the back?
+    const [usersearch, searchForUsers] = useState();
+    const [users, findUsers] = useState([]);
 
-    console.log("users", users);
+    useEffect(() => {
+        if (usersearch == null) {
+            return;
+        }
+        console.log("useEffect of findUsers");
+        axios.get(`/users/search/?q=${usersearch}`)
+            .then(({ data }) => {
+                console.log("data in recent users", data);
+                // displayRecentUsers(data);
+                findUsers(data);
+            })
+            .catch((error) => {
+                console.log("error in useEffect get search users", error);
+            });
+    }, [usersearch]); // end useEffect
+
+    console.log("data in users", users);
+
 
     const handleChangeSearch = (e) => {
-        findUsers(e.target.value);
+        searchForUsers(e.target.value);
     };
 
-    // the userdata gives you back an array with the users matching the search ...
-    // put them in a nice list
+    // recently joined
 
-    /// 1. get back the three most recent (DB)
-    /// 2. search users (DB)
+    // recentUsers.map is not a function!
 
-    // map the last 3
-    // map all the users form the array []
+    // add error handling!
 
-    // hooks can I get props?
 
-    // conditional rendering and return the right stuff / get the right users {&&}
 
     // open the search field 
 
-    const searchResults = () => {
-        if (recentUsers) {
-            return (
-                <React.Fragment>
-                    <div>
-                        <h1>Recent Users</h1>
-                        {recentUsers.map((recent) => {
-                            return (
-                                <div key={recent.id}>
-                                    <Link to={`user/${recent.id}`}>
-                                        <img src={recent.imgUrl}></img>
-                                    </Link>
-                                    <p>
-                                        {recent.first} {recent.last}
-                                    </p>
-                                </div>
-                            );
-                        })}
+    return (
+        <React.Fragment>
+            {usersearch == null && (
+                <div>
+                    <h1>Recently joined ...</h1>
 
-                        <h1>Find other Users</h1>
-                        <p>please find a user:</p>
-                        <input
-                            onChange={handleChangeSearch}
-                            placeholder="enter a username"
-                        />
-                    </div>
-                </React.Fragment>
-            );
-        } else if (users) {
-            return (
-                <React.Fragment>
-                    <div>
-                        <h1>Find someone</h1>
-                        <p>no matches</p>
-                        <input
-                            onChange={handleChangeSearch}
-                            placeholder="enter a username"
-                        />
-                        {users.map((user) => {
-                            return (
-                                <div key={user.id}>
-                                    <Link to={`user/${user.id}`}>
-                                        <img src={user.imgUrl}></img>
-                                    </Link>
-                                    <p>
-                                        {user.first} {user.last}
-                                    </p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </React.Fragment>
-            );
+                    {recentUsers.map((recent) => {
+                        return (
+                            <div key={recent.id}>
+                                <p>
+                                    {recent.first} {recent.last} 
+                                </p>
+                                <Link to={`user/${recent.id}`}>
+                                    <img
+                                        width="100px"
+                                        style={{}}
+                                        src={recent.img_url}
+                                    ></img>
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
+            <h1>Search for someone ...</h1>
 
-        }
+            <input
+                onChange={handleChangeSearch}
+                placeholder="enter a username"
+                type="text"
+            />
 
-    };
+            {usersearch !== null && (
+                <div>
+                    {users.map((recent) => {
+                        return (
+                            <div key={recent.id}>
+                                <p>
+                                    {recent.first} {recent.last}
+                                </p>
+                                <Link to={`user/${recent.id}`}>
+                                    <img
+                                        width="100px"
+                                        style={{}}
+                                        src={recent.img_url}
+                                    ></img>
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
-    return searchResults();
-
+            {usersearch !== null && users.length == 0 && (
+                <p>Apparently no results for {`${usersearch}`}</p>
+            )}
+        </React.Fragment>
+    );
 }
+
+
+
+
+/*
+                {users && (
+                    users.map((user) => {
+                    
+                        <div key={user.id}>
+                            <Link to={`user/${user.id}`}>
+                                <img src={user.imgUrl}></img>
+                            </Link>
+                            <p>
+                                {user.first} {user.last}
+                            </p>
+                        </div>
+                
+                    }))}
+
+                    
+                    */
+//                    <h2>say hello to ...</h2>

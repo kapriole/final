@@ -2,6 +2,7 @@ import React from "react";
 import axios from "./axios"; // this is already the copy 
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import Logo from "./logo";
+import Reset from "./reset";
 import Uploader from "./uploader";
 import Profile from "./profile";
 import ProfilePic from "./profilepic";
@@ -9,7 +10,9 @@ import OtherProfile from "./otherprofile";
 import FindPeople from "./findpeople";
 import Friends from "./friends";
 import Chat from "./chat";
+import Login from "./login";
 import Logout from "./logout";
+
 
 // import styled from "styled-components";
 
@@ -17,7 +20,6 @@ export default class App extends React.Component {
     constructor() {
         super();
         this.state = {
-            uploaderIsVisible: false
         };
         this.myImgUrl = this.myImgUrl.bind(this);
         this.setBio = this.setBio.bind(this);
@@ -35,7 +37,7 @@ export default class App extends React.Component {
                     first: userdata.data.first,
                     last: userdata.data.last,
                     element: userdata.data.element,
-                    imgUrl: userdata.data.imgUrl, // check the name
+                    imgUrl: userdata.data.imgUrl,
                     bio: userdata.data.bio // get more userdata from the DB!
                 });
             }).catch(error => {                                                   
@@ -60,7 +62,7 @@ export default class App extends React.Component {
         console.log(" imageUpload worked / works!");
         this.setState({
             imgUrl: newImgUrl,
-            uploaderIsVisible: !this.state.uploaderIsVisible
+            //uploaderIsVisible: !this.state.uploaderIsVisible
         });
     }
 
@@ -87,21 +89,13 @@ export default class App extends React.Component {
                                 marginRight: "20px",
                             }}
                         >
-                            <Link to="/users/search">
-                                Find Users
-                            </Link>
+                            <Link to="/users">Find Users</Link>
                             <br></br>
-                            <Link to="/chat">
-                                Chat
-                            </Link>
+                            <Link to="/chat">Chat</Link>
                             <br></br>
-                            <Link to="/friends" >
-                                Friends
-                            </Link>
+                            <Link to="/friends">Friends</Link>
                             <br></br>
-                            <Link to="/logout">
-                                Logout
-                            </Link>
+                            <Link to="/logout">Logout</Link>
                             <br></br>
                         </div>
 
@@ -109,7 +103,7 @@ export default class App extends React.Component {
                             first={this.state.first}
                             last={this.state.last}
                             imgUrl={this.state.imgUrl}
-                            uploaderIsVisible={!this.state.uploaderIsVisible}
+                            //uploaderIsVisible={!this.state.uploaderIsVisible}
                         />
 
                         <div
@@ -132,6 +126,7 @@ export default class App extends React.Component {
                                         imgUrl={this.state.imgUrl}
                                         bio={this.state.bio}
                                         setBio={this.setBio}
+                                        toggleModal={this.toggleModal}
                                     />
                                 )}
                             />
@@ -153,21 +148,8 @@ export default class App extends React.Component {
                                     />
                                 )}
                             />
-                            <Route
-                                path="/users/search/:id"
-                                render={() => (
-                                    <FindPeople
-                                        userId={this.state.userId}
-                                        first={this.state.first}
-                                        last={this.state.last}
-                                        imgUrl={this.state.imgUrl}
-                                    />
-                                )}
-                            />
-                            <Route
-                                direct path="/friends"
-                                component={Friends}
-                            />
+                            <Route path="/users" component={FindPeople} />
+                            <Route direct path="/friends" component={Friends} />
                             <Route
                                 path="/chat"
                                 render={(props) => (
@@ -178,16 +160,12 @@ export default class App extends React.Component {
                                     />
                                 )}
                             />
+
+                            <Route path="/login" component={Login} />
+                            <Route path="/logout" component={Logout} />
                             <Route
-                                path="/logout"
-                                render={(props) => (
-                                    <Logout
-                                        key={props.match.url}
-                                        match={props.match}
-                                        history={props.history}
-                                        userId={this.state.userId}
-                                    />
-                                )}
+                                path="/reset/password/start"
+                                component={Reset}
                             />
                         </div>
                     </div>
@@ -196,5 +174,3 @@ export default class App extends React.Component {
         );
     }
 }
-
-// check the userId and ids 

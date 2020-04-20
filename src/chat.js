@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { socket } from "./socket";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 export default function Chat() {
 
@@ -50,14 +51,28 @@ export default function Chat() {
                     renderMessages.map((message) => {
                         return (
                             <div key={message.id}>
-                                <img width="50px" src={message.img_url}></img>
+                                <Link to={`user/${message.sender_id}`}>
+                                    <div
+                                        style={{
+                                            width: "50px",
+                                            height: "50px",
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <img
+                                            width="50px"
+                                            src={
+                                                message.img_url ||
+                                                message.imgUrl
+                                            }
+                                        ></img>
+                                    </div>
+                                </Link>
                                 <p>
                                     {message.first} {message.last}
                                 </p>
                                 <p>{message.message_text}</p>
-                                <p>
-                                    {message.created_at}
-                                </p>
+                                <p>{message.created_at}</p>
                             </div>
                         );
                     })}

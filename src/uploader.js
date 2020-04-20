@@ -5,6 +5,7 @@ export default class Uploader extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+
         };
     }
     componentDidMount() {
@@ -20,6 +21,7 @@ export default class Uploader extends React.Component {
    
     uploadImage(e) {
         e.preventDefault();
+        
         console.log("uploade image in uploader");
         var formData = new FormData();
         // this props! 
