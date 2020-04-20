@@ -43,10 +43,7 @@ export default function Profile({ first, last, element, imgUrl, bio, setBio, tog
             <br></br> Element: {element}
             <br></br> <br></br>
             <Bioeditor bio={bio} setBio={setBio} />
-            <HoverText
-                onClick={toggleModal}>
-                upload a new photo!
-            </HoverText>
+            <HoverText onClick={toggleModal}>upload a new photo!</HoverText>
         </React.Fragment>
     );   
     

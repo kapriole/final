@@ -7,7 +7,6 @@ export default class Bioeditor extends React.Component {
                        this.state = {
                            step: null
                        };
-                       console.log("props!", props);
     }
     
     // track the  state of current bio and then make a conditional current 
@@ -16,10 +15,11 @@ export default class Bioeditor extends React.Component {
 
                    componentDidMount() {
                        console.log("bioeditor mounted!!");
-                       this.uploadBio();
+                       console.log("props!", this.props);
+
                    }
 
-                   uploadBio(e) {
+                   uploadBio() {
                        console.log("uploade text for bio");
                        var bioText = this.state.bio;
                        console.log("this state bio", this.state.bio);
@@ -34,6 +34,10 @@ export default class Bioeditor extends React.Component {
                                );
                                // send the response to setBio
                                self.props.setBio(response.data); // check e = response
+                                                      this.setState({
+                                                          step: "bioexists",
+                                                      });
+
                            })
                            .catch((err) => {
                                console.log("err in POST /bio: ", err);
@@ -53,29 +57,30 @@ export default class Bioeditor extends React.Component {
                            [target.name]: target.value,
                        });
                    }
-
                    // similar to vue
                    render() {
+                       
                        console.log("this.state", this.state);
                        const step = this.state.step;
                        if (step == null) {
                            return (
-                                                 <div>
-                                                     <p>
-                                                         No Bio Yet
-                                                     </p>
-                                                     <button
-                                                         onClick={() =>
-                                                             this.setState({
-                                                                 step:
-                                                                     "changebio",
-                                                             })
-                                                         }
-                                                     >
-                                                        Add my Lifestory
-                                                     </button>
-                                                 </div>
-                                             );
+                               <div>
+                                   
+                                       {this.props.bio && (
+                                           <p> Bio: {this.props.bio}</p>
+                                       )}
+                                   
+                                   <button
+                                       onClick={() =>
+                                           this.setState({
+                                               step: "changebio",
+                                           })
+                                       }
+                                   >
+                                       Add my Lifestory
+                                   </button>
+                               </div>
+                           );
                           
                       }
                       else if (step == "nobio") {
@@ -116,13 +121,9 @@ export default class Bioeditor extends React.Component {
                                        accept="text"
                                    />
                                    <br></br>
-                                   <button
+                                   <button  
                                        onClick={
-                                           ((e) => this.uploadBio(e),
-                                           () =>
-                                               this.setState({
-                                                   step: "bioexists",
-                                               }))
+                                           (() => this.uploadBio())
                                        }
                                    >
                                        Upload your New Lifestory!

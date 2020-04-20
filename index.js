@@ -487,7 +487,7 @@ app.post("/bio", (req, res) => {
     const bio = req.body.newBio;
     db.updateBio(userId, bio).then(data => {
         let newBio = data.rows[0].bio;
-        res.json({ newBio });
+        res.json( newBio );
     }).catch(err => { console.log("error", err);});
 });
 

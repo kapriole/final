@@ -46,7 +46,7 @@ export default class OtherProfile extends React.Component {
                     />
                     <br></br> Element: {this.state.element}
                     <br></br> <br></br>
-                    {this.state.bio && (<p> My Bio: {this.state.bio}</p>)}
+                    {this.state.bio && (<p> Bio: {this.state.bio}</p>)}
                     <FriendButton
                         userId={this.props.userId}
                         otherUserId={this.props.match.params.id}

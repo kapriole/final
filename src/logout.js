@@ -63,7 +63,19 @@ export default class Logout extends React.Component {
                     {this.state.loggedOut && (
                         <div className="loggedOut">
                             <p>Thanks for coming by!</p>
-                            <Link to="/welcome#/">Go back to Welcome</Link>
+                            <div style={{width:"100%", height: "0", paddingBottom: "56%", position: "relative"}}>
+                                <iframe
+                                    src="https://giphy.com/embed/OSWRJKmwUEOD6"
+                                    width="200%"
+                                    height="200%"
+                                    style= {{ position: "absolute" }}
+                                    frameBorder="0"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                            <p>
+                            </p>
+                            <Link to="/welcome">Go back to Welcome</Link>
                             <br></br>
                         </div>
                     )}
@@ -73,5 +85,6 @@ export default class Logout extends React.Component {
     }        
                        
 }
+
 
 // reload page!

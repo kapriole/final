@@ -144,7 +144,7 @@ module.exports.updateBio = (userId, bio) => {
 
 module.exports.getRecentUsers = () => {
     const q = `
-        SELECT * FROM users
+        SELECT id, first, last, class, img_url FROM users
         ORDER BY created_at DESC
         LIMIT 3
     `;
@@ -153,7 +153,7 @@ module.exports.getRecentUsers = () => {
 
 module.exports.findUsers = (input) => {
     return db.query(`
-    SELECT id, first, last, img_url FROM users WHERE first ILIKE $1`, 
+    SELECT id, first, last, class, img_url FROM users WHERE first ILIKE $1`, 
     [input + '%']);
 };
 
