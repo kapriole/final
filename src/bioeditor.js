@@ -2,8 +2,8 @@ import React from 'react';
 import axios from './axios';
 
 export default class Bioeditor extends React.Component {
-                constructor(props) {
-                       super(props);
+    constructor(props) {
+        super(props);
                        this.state = {
                            step: null
                        };
@@ -16,9 +16,10 @@ export default class Bioeditor extends React.Component {
 
                    componentDidMount() {
                        console.log("bioeditor mounted!!");
+                       this.uploadBio();
                    }
 
-                   uploadBio() {
+                   uploadBio(e) {
                        console.log("uploade text for bio");
                        var bioText = this.state.bio;
                        console.log("this state bio", this.state.bio);

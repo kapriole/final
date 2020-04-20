@@ -482,7 +482,7 @@ app.post("/upload", uploader.single("file"), s3.upload, (req, res) => {
 
 app.post("/bio", (req, res) => {
     console.log("BIO req.session.userId", req.session.userId);
-    console.log("BIO req.bodynewBio", req.body.newBio);
+    console.log("BIO req.body", req.body);
     const userId = req.session.userId;
     const bio = req.body.newBio;
     db.updateBio(userId, bio).then(data => {
