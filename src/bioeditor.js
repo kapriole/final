@@ -8,7 +8,6 @@ export default class Bioeditor extends React.Component {
                            step: null
                        };
     }
-    
     // track the  state of current bio and then make a conditional current 
 
                    // check if bio exists ! and put it in the step!
@@ -37,7 +36,6 @@ export default class Bioeditor extends React.Component {
                                                       this.setState({
                                                           step: "bioexists",
                                                       });
-
                            })
                            .catch((err) => {
                                console.log("err in POST /bio: ", err);
@@ -77,7 +75,7 @@ export default class Bioeditor extends React.Component {
                                            })
                                        }
                                    >
-                                       Add my Lifestory
+                                       Edit my Lifestory
                                    </button>
                                </div>
                            );

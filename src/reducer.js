@@ -42,7 +42,7 @@ export default function reducer(state = {}, action) {
                     // id of user who accepted request and is friend
                     return {
                         ...user,
-                        accepted: false
+                        accepted: false,
                     };
                 } else {
                     return user;

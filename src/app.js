@@ -160,9 +160,8 @@ export default class App extends React.Component {
                                     />
                                 )}
                             />
-
+                            <Route exact path="/logout" component={Logout}></Route>
                             <Route path="/login" component={Login} />
-                            <Route path="/logout" component={Logout} />
                             <Route
                                 path="/reset/password/start"
                                 component={Reset}

@@ -36,14 +36,12 @@ export default function Friends() {
             <div id="friendsandwannabes">
                 <h2>See my friends:</h2>
 
-                {!friendsWannabes && (
-                    <div>
-                        <p>
-                            sorry but you have no friends / Link to finding
-                            users!
-                        </p>
-                    </div>
-                )}
+                {friendsWannabes == null && (
+                          <div>
+                              <p>sorry but you have no friends!</p>
+                          </div>
+                      )
+               }
 
                 {friendsWannabes &&
                     friendsWannabes.map((user, index) => {
@@ -67,14 +65,14 @@ export default function Friends() {
                                     {user.first} {user.last} <br></br> Element:
                                     {user.class}
                                 </p>
-                                <br></br>
                                 <p>wants to be your friend ...</p>
-                                <br></br>
                                 <div className="wannabes">
                                     <button
                                         onClick={() =>
                                             dispatch(
-                                                acceptFriendRequest(user.id)
+                                                acceptFriendRequest(
+                                                    user.id
+                                                )
                                             )
                                         }
                                     >
@@ -105,7 +103,8 @@ export default function Friends() {
                                     </div>
                                 </Link>
                                 <p>
-                                    {user.first} {user.last} <br></br> Element: {user.class}
+                                    {user.first} {user.last} <br></br> Element:{" "}
+                                    {user.class}
                                 </p>
                                 <div className="friends">
                                     <button

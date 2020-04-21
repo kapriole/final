@@ -147,6 +147,7 @@ export default class Reset extends React.Component {
                                        </div>
                                    )}
                                    <h2>YEEEEEEEEAAAAAHHHHH</h2>
+                                   <p>Your Password was reset</p>
                                </div>
                            );
                        } else {
@@ -157,7 +158,6 @@ export default class Reset extends React.Component {
                    render() {
                        return (
                            <div>
-                               <h1>Something happening?</h1>
                                {this.getCurrentDisplay()}
                            </div>
                        );

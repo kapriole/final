@@ -15,12 +15,12 @@ export async function receiveFriendsWannabes() {
 
 export async function acceptFriendRequest(otherUserId) {
     
-    console.log("data from accept friendship axios post");
+    console.log("otherUserId,", otherUserId);
 
     const { data } = await axios.post("/add-friendship/" + otherUserId);
     return {
-        type: "ACCEPT-FRIENDSHIP",
-        otherUserId // id of the user whose friendship was accepted
+        type: "ACCEPT_FRIEND_REQUEST",
+        otherUserId, // id of the user whose friendship was accepted
     };
 }
 
