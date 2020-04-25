@@ -5,11 +5,18 @@
     <title>Making a Phaser 3 Game</title>
    
     <style type="text/css">
+      @font-face {
+        font-family: font1;
+        src: url('assets/m5x7.ttf');
+        font-weight:400;
+        font-weight:normal;
+    } 
         body {
              background: #000000;
                 padding: 0px;
                 margin: 0px;
         }
+        
         div {
         border: 1px solid black;
         display: flex;
@@ -24,10 +31,12 @@
         align-items: center;
         }
     </style>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.22.0/dist/phaser.min.js"></script> 
 </head>
 <body>
     <div id="game"></div>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <script src = "game.js"></script>
+    <div style="font-family:font1; position:absolute; left:-1000px; visibility:hidden;">.</div>
+    <script src="game.js">
+    </script> 
 </body>
 </html>
