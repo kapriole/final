@@ -22,14 +22,20 @@ const game = new Phaser.Game(config);
 
     let map;
     let groundLayer;
-    let player;
+let player;
     let stars;
+let antidote;
+let phone; // define phone in create ...
     let bombs;
     let platforms;
+let obstacles;
     let cursors;
     let score = 0;
     let life = 0;
-    let gameOver = false;
+let gameOver = false;
+let phonecallanswer = false;
+let winner = true;
+
     let scoreText;
 let gameStart = false;
 let title;
@@ -38,109 +44,60 @@ let soundcough;
 let soundobstacle;
 let soundemergency;
 let soundgame;
+let soundphone;
+let soundmom;
+let soundantidote;
 
 
 function preload() {
-                       /// load assets
-                       this.load.image("title", "assets/images/title.png");
-                       this.load.image("star", "assets/star.png"); //pizza
-                       this.load.image("bomb", "assets/bomb.png"); //corona
+    /// load assets
+    //this.load.image("title", "assets/images/title.png");
+    this.load.image("star", "assets/star.png"); //pizza
+    this.load.image("bomb", "assets/bomb.png"); //corona
+    this.load.image("antidote", "assets/antidote.png");
+    this.load.image("phone", "assets/phone.png");
+    this.load.image("phonescreen", "assets/phonescreen.png"); // add the phone screen mom is calling!!
+    this.load.image("winner", "assets/end.png");
 
-                       // Load player animations from the player spritesheet and atlas JSON / or atlas
-                       this.load.spritesheet("dude", "assets/dude.png", {
-                           frameWidth: 32,
-                           frameHeight: 48,
-                       });
-
-                       /// GAMEOVER
-                       this.load.image("gameover", "assets/gameover.gif");
-
-                       /// LOADING MY TILES
-                       this.load.image(
-                           "background",
-                           "assets/tilemaps/urban_night_black.png"
-                       ); // I dont think I need this
-                       this.load.image(
-                           "obstacle",
-                           "assets/tilemaps/toxic_water.png"
-                       ); // the cactuses are also obstacle / just hide the same object behind?
-                       this.load.image("water", "assets/tilemaps/water.png");
-                       this.load.image(
-                           "tiles",
-                           "assets/tilemaps/corona_tiles.png"
-                       );
-                       this.load.tilemapTiledJSON(
-                           "map",
-                           "assets/tilemaps/level_one.json"
-                       );
-
-                       // also add every element so phaser can render it
-
-                       // moving platform
-                       this.load.image("block", "assets/platform.png");
-
-                       /////////// SOUNDS
-                       // sound effects
-                       //this.load.audio('bg', [this.p('audio/bg.mp3'),this.p('audio/bg.ogg')]);
-                       this.load.audio("bite", ["sound/bite.wav"]);
-                       this.load.audio("cough", [
-                                                  "sound/cough.wav",
-                                              ]);
-
-                       this.load.audio("obstacle", ["sound/cough.wav"]);
-                                              this.load.audio("emergency", [
-                                                  "sound/emergency.mp3"
-                                              ]);
-                    // intro sounds
-                    // this.load.audio("intro", ["sound/intro.mp3"]); // debris 
-                    this.load.audio("game", ["sound/game.mp3"]); // abyssal
-    
-                   }
-function create() {
-                      /*
-    title = this.add.image(400, 300, "title", {
-        visibility: "hidden"
+    // Load player animations from the player spritesheet and atlas JSON / or atlas
+    this.load.spritesheet("dude", "assets/dude.png", {
+        frameWidth: 32,
+        frameHeight: 48,
     });
-                      ///////// set the object from background to foreground
-                  
-                      Phaser.Display.Align.In.Center(
-                          this.title,
-                          this.add.zone(
-                              window.innerWidth / 2,
-                              window.innerHeight / 2,
-                              window.innerWidth,
-                              window.innerHeight
-                          )
-                      );
 
-                      title.tweens.add({
-                          targets: title,
-                          y: 450,
-                          duration: 2000,
-                          ease: "Power2",
-                          yoyo: true,
-                          loop: -1,
-                      });
-    
-                      title.setInteractive();
+    this.load.image("enemy", "assets/enemy.png");
 
-                              console.log("title", title);
+    /// GAMEOVER
+    this.load.image("gameover", "assets/gameover.png");
 
-                              title.on(
-                                  "pointerdown",
-                                  function () {
-                                      console.log("mouse is down!");
-                                      //text.setText("Game OVER");
-                                      //this.scene.restart();
-                                      console.log("this", this);
-                                      this.scene.restart("game");
-                                      console.log("gameOver", gameOver);                                         
-                                      gameOver = false;
-                                      return;
-                                  },
-                                  this
-                              );
-                      */
+    /// LOADING MY TILES
+    this.load.image("background", "assets/tilemaps/urban_night_black.png"); // I dont think I need this
+    //this.load.image("obstacle", "assets/tilemaps/toxic_water.png"); // the cactuses are also obstacle / just hide the same object behind?
+    //this.load.image("water", "assets/tilemaps/water.png");
+    this.load.image("tiles", "assets/tilemaps/corona_tiles.png");
+    this.load.tilemapTiledJSON("map", "assets/tilemaps/level_one.json");
+
+    // also add every element so phaser can render it
+
+    // moving platform
+    this.load.image("block", "assets/platform.png");
+
+    /////////// SOUNDS
+    // sound effects
+    //this.load.audio('bg', [this.p('audio/bg.mp3'),this.p('audio/bg.ogg')]);
+    this.load.audio("bite", ["sound/bite.wav"]);
+    this.load.audio("cough", ["sound/cough.wav"]);
+
+    this.load.audio("obstacle", ["sound/cough.wav"]);
+    this.load.audio("emergency", ["sound/emergency.mp3"]);
+    // intro sounds
+    // this.load.audio("intro", ["sound/intro.mp3"]); // debris
+    this.load.audio("game", ["sound/game.mp3"]); // abyssal
+    this.load.audio("phone", ["sound/phone.wav"]); 
+    this.load.audio("antidote", ["sound/antidote.wav"]);
+    this.load.audio("mom", ["sound/mom.wav"]); // abyssal
+}
+function create() {
 
                        const map = this.make.tilemap({ key: "map" });
                        const tileset = map.addTilesetImage(
@@ -176,7 +133,7 @@ function create() {
 
                        /// add obstacels
 
-                       const obstacles = map.createDynamicLayer(
+                       obstacles = map.createDynamicLayer(
                            "Obstacles",
                            tileset,
                            0,
@@ -232,8 +189,8 @@ function create() {
 
                        // in case I have to resize
                        player.body.setSize(
-                           player.width - 10,
-                           player.height - 10
+                           player.width -10,
+                           player.height - 18
                        );
 
                        //  Our player animations, turning, walking left and walking right.
@@ -273,6 +230,24 @@ function create() {
                            setXY: { x: 12, y: 0, stepX: 70 }, // use player position
                        });
 
+
+    /// add antidote
+    antidote = this.physics.add.group({
+                           key: "antidote",
+                           repeat: 0, // use to be 11
+                           setXY: { x: 1500, y: 0, stepX: 70 }, // use player position
+                       });
+
+                         /// add antidote
+    phone = this.physics.add.group({
+                           key: "phone",
+                           repeat: 0, // use to be 11
+                           setXY: { x: 650, y: 0, stepX: 70 }, // use player position
+    });
+
+                       
+                       
+
                        stars.children.iterate(function (child) {
                            //  Give each star a slightly different bounce
                            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
@@ -284,7 +259,9 @@ function create() {
                        this.physics.add.collider(platforms, player);
                        this.physics.add.collider(platforms, stars);
                        this.physics.add.collider(platforms, bombs);
-                       this.physics.add.collider(player, obstacles);
+                     
+    
+                       this.physics.add.collider(obstacles, player);
 
                        // why is obstacle undefined?
 
@@ -328,36 +305,125 @@ function create() {
                            null,
                            this
                        );
+                        /*
+             this.physics.add.collider(
+                           player,
+                           phone,
+                           getPhoneCall,
+                           null,
+                           this
+                       );
+                       */
 
-                       
-            this.physics.add.collider(
+              this.physics.add.collider(
                 player,
                 obstacles,
-                playerCough,
+                playerCough, // ring!!!
                 null,
                 this
             );
 
+            
+              this.physics.add.collider(
+                  player,
+                  antidote,
+                  playerWins, // ring!!!
+                  null,
+                  this
+              );
+
+               this.physics.add.collider(
+                  player,
+                  enemy,
+                  socialContact, // ring!!!
+                  null,
+                  this
+              );
+    
+
+
         
-                       /*
+            /*
             Create platforms at the point locations in the "Platform Locations" layer created in Tiled
             map.getObjectLayer("Platform Locations").objects.forEach(point => {
                 createRotatingPlatform(this, point.x, point.y);
             });
             */
 
-                       /// add some more plattform thruout the game
+    /// add some more plattform thruout the game
+  
+    // check the coordinates
+        
+        let block = this.physics.add
+            .image(150, 330, "block")
+            .setImmovable(true)
+            .setVelocity(100, -100);
 
-                       let block = this.physics.add
-                           .image(100, 320, "block")
-                           .setImmovable(true)
-                           .setVelocity(100, -100);
+        block.body.setAllowGravity(false);
 
-                       block.body.setAllowGravity(false);
+        let tween = this.tweens.add({
+            targets: block,
+            x: 300,
+            ease: "Power1",
+            duration: 3000,
+            flipY: false,
+            yoyo: true,
+            repeat: -1,
+        });
+    
+    let block2 = this.physics.add
+        .image(1200, 1330, "block")
+        .setImmovable(true)
+        .setVelocity(100, -100);
+
+    block2.body.setAllowGravity(false);
+
+    let tween2 = this.tweens.add({
+        targets: block2,
+        x: 300,
+        ease: "Power1",
+        duration: 3000,
+        flipY: false,
+        yoyo: true,
+        repeat: -1,
+    });
+
+
+    /// create a tween for the enemies
+  let  enemy = this.physics.add.image(1500, 0, "enemy");// where to put the enemy?
+ // coordinates / velocity-
+   enemy.setBounce(0.1);
+   enemy.setCollideWorldBounds(true);
+
+   // in case I have to resize
+   enemy.body.setSize(enemy.width - 10, enemy.height - 18);
+
+    let tween3 = this.tweens.add({
+        targets: enemy,
+        x: 1300,
+        ease: "Bounce.InOut",
+        duration: 3000,
+        flipX: true,
+        yoyo: true,
+        repeat: -1,
+    });
+                
+   
+
 
                        this.physics.add.collider(block, player);
 
                        this.physics.add.collider(block, platforms);
+
+                        this.physics.add.collider(block2, player);
+
+                       this.physics.add.collider(block2, platforms);
+
+                          this.physics.add.collider(platforms, phone);
+                          this.physics.add.collider(platforms, antidote);
+                          this.physics.add.collider(platforms, enemy);
+
+
 
                        // set bounds so the camera won't go outside the game world
                        this.cameras.main.setBounds(
@@ -380,15 +446,34 @@ function create() {
     soundobstacle = this.sound.add("cough"); // for testing
     soundemergency = this.sound.add("emergency");
     soundgame = this.sound.add("game");
+    soundphone = this.sound.add("phone");
+    soundantidote = this.sound.add("antidote");
+    soundmom = this.sound.add("mom");
+
+    soundgame.loop = true;
     soundgame.play();
+
+
+    /// sparkle
+
+
+
+
+
+
+    // setTimeout(function () { soundphone.play(); }, 15000 ); // play when near
+
 
                        //this.sfxbomb = this.sound.add("bomb");
                    }
         
 
         function update() {
-
-
+            
+            if (phonecallanswer) {
+                return;
+            }
+            
             if (gameOver) {
                 return;
             }
@@ -416,7 +501,7 @@ function create() {
 
             //// add a score for extra Life OKK
             if (score >= 500) {
-                console.log("add a life and delte score");
+                console.log("add a life and delete score");
                 score -= 500;
                 //tint the color depending on the current score
                 life += 1;
@@ -427,6 +512,9 @@ function create() {
                 console.log("life", life);
 
             } 
+
+            console.log("life score", life);
+
         }
 
         /// star is pizza pieces now
@@ -440,7 +528,7 @@ function collectStar(player, star) {
             star.disableBody(true, true);
 
             //  Add and update the score
-            score += 400;
+            score += 50;
             scoreText.setText("Score: " + score);
 
             if (stars.countActive(true) === 0) {
@@ -462,6 +550,92 @@ function collectStar(player, star) {
             }
         }
 
+
+function socialContact(player, enemy) {
+    console.log("collision happened!");
+// add sound make the same as 
+    // enemy.disableBody(true, true); // cann be people
+    // add effect: 
+    player.setTint(0x7cc233);
+    score -= 50;
+
+}
+
+// collision has to happen once!
+/*
+function getPhoneCall(player, phone) {
+    soundphone.stop();
+    this.physics.pause();
+    phone.destroy();
+
+    phonecallanswer = true;
+
+    if (phonecallanswer) {
+         soundmom.play();
+         soundphone.stop();
+         let phonescreen = this.physics.add.image(400, 320, "phonescreen");
+
+         phonescreen.setScrollFactor(0);
+         phonescreen.setInteractive();
+
+         console.log("phonescreen", phonescreen);
+
+         phonescreen.on(
+             "pointerdown",
+             function () {
+                 console.log("mouse is down!");
+                 //text.setText("Game OVER");
+                 this.scene.restart();
+                 phonecallanswer = false;
+                 console.log("this", this);
+                 return;
+             },
+             this
+         );
+    }
+           
+}
+*/
+
+function playerWins(player, antidote) {
+    // add fancy effect!!
+    soundantidote.play();
+    score += 100000;
+    scoreText.setText("Score: " + score);
+    // antidote.disableBody(true, true);
+    player.setVelocity(0, 0);
+    // set a winning screen!
+    this.physics.pause();
+    winner = true;
+
+    if (winner) {
+    soundgame.stop();
+
+    let endscreen = this.physics.add.image(400, 320, "winner");
+    endscreen.setScrollFactor(0);
+    endscreen.setInteractive();
+
+    console.log("gameoverscreen", endscreen);
+
+    endscreen.on(
+        "pointerdown",
+        function () {
+            console.log("mouse is down on ending!");
+            console.log("this", this);
+            console.log("gameOver", gameOver);
+            winner = false;
+            soundantidote.stop();
+            this.scene.restart("game");
+            return;
+        },
+        this
+    );
+
+    return;
+}
+
+
+}
         /*
         
 function playerCollide(player, obstacle) {
@@ -479,6 +653,11 @@ function playerCollide(player, obstacle) {
 
 function playerCough(player, obstacles){
         soundcough.play();
+}
+
+
+function playerPhone(player, phone) {
+    soundphone.play();
 }
 
 function hitBomb(player, bomb) {
@@ -507,12 +686,13 @@ function hitBomb(player, bomb) {
           gameOver = true;
 
     }
-
           
-            // add a game over screen
+    // add a game over screen
 
     if (gameOver) {
         soundemergency.play();
+        soundgame.stop();
+
                               this.physics.pause(); // apparently stays pause when restarted
 
                               let gameoverscreen = this.physics.add.image(
@@ -529,41 +709,25 @@ function hitBomb(player, bomb) {
                                   "pointerdown",
                                   function () {
                                       console.log("mouse is down!");
-                                      //text.setText("Game OVER");
-                                      //this.scene.restart();
                                       console.log("this", this);
                                       this.scene.restart("game");
                                       console.log("gameOver", gameOver);                                         
                                       gameOver = false;
                                       soundemergency.stop();
-                                      soundgame.stop();
-
                                       return;
                                   },
                                   this
                               );
 
                               return;
-
-                              // yeah it worked! don't forget to put this inside the parenthesis
-
-                              // works but make it happen on mouseclickevent
-                              //this.registry.destroy();
-                              //this.events.off();
-
-                              // character is not movin when restarted
-                              // had to set gameOver to false !
-
-                              // https://photonstorm.github.io/phaser3-docs/Phaser.Scenes.SceneManager.html
-                              // https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scenemanager/
-                              // https://phaser.io/phaser3/contributing/part5
                           }
 
 }
 
 
-            //// reset player
-            /*
+//// reset player
+
+/*
 function resetPlayer(player, obstacles) {
     player.setTint(0x7cc233);
     console.log("resetPlayer running");
@@ -572,54 +736,3 @@ function resetPlayer(player, obstacles) {
             // player.reset(200, 600); // postion of the player
             };
 */
-
-/*
-function startScreen() {
-    gameStart = true;
-    console.log("gameStart happening?");
-
-    // add a game over screen
-
-    if (gameStart) {
-        let title;
-
-        title.add.image(400, 350, "title");
-
-        title.setInteractive();
-
-        console.log("startscreen", title);
-
-        title.on(
-            "pointerdown",
-            function () {
-                console.log("mouse is down!");
-                //text.setText("Game OVER");
-                //this.scene.restart();
-                console.log("gameOver", gameStart);
-                gameStart = false;
-                return;
-            },
-            this
-        );
-    }
-}
-*/
-/// just make a function for the titlescreeen 
-
-/// wit a clickhandler
-
-
-
-        
-              
-
-        ///// put sth in middle of the canvas
-        //this.face = this.add.image(game.config.width / 2, game.config.height / 2, "face");
-
-        /// listen for clicks on an object
-        //gameoverscreen
-
-        /// Mutations-Ereignisse sollten nicht mehr verwendet werden. Verwenden Sie MutationObserver stattdessen.
-
-        // make another scene
-
