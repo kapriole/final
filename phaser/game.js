@@ -27,86 +27,165 @@ const game = new Phaser.Game(config);
     let bombs;
     let platforms;
     let cursors;
-let score = 0;
-let life = 0;
+    let score = 0;
+    let life = 0;
     let gameOver = false;
     let scoreText;
-    let gameStart = false;
+let gameStart = false;
+let title;
+let soundbite;
+let soundcough;
+let soundobstacle;
+let soundemergency;
+let soundgame;
 
 
 function preload() {
-        /// load assets
-        this.load.image("title", "assets/images/title.png");
-        this.load.image("star", "assets/star.png"); //pizza
-        this.load.image("bomb", "assets/bomb.png"); //corona
+                       /// load assets
+                       this.load.image("title", "assets/images/title.png");
+                       this.load.image("star", "assets/star.png"); //pizza
+                       this.load.image("bomb", "assets/bomb.png"); //corona
 
-        // Load player animations from the player spritesheet and atlas JSON / or atlas
-        this.load.spritesheet("dude", "assets/dude.png", { 
-            frameWidth: 32,
-            frameHeight: 48,
-        });
+                       // Load player animations from the player spritesheet and atlas JSON / or atlas
+                       this.load.spritesheet("dude", "assets/dude.png", {
+                           frameWidth: 32,
+                           frameHeight: 48,
+                       });
 
-        /// GAMEOVER
-        this.load.image("gameover", "assets/gameover.gif");
+                       /// GAMEOVER
+                       this.load.image("gameover", "assets/gameover.gif");
 
-        /// LOADING MY TILES
-        this.load.image("background", "assets/tilemaps/urban_night_black.png"); // I dont think I need this
-        this.load.image("obstacle", "assets/tilemaps/toxic_water.png"); // the cactuses are also obstacle / just hide the same object behind?
-        this.load.image("water", "assets/tilemaps/water.png");
-        this.load.image("tiles", "assets/tilemaps/corona_tiles.png");
-        this.load.tilemapTiledJSON(
-                    "map",
-                    "assets/tilemaps/level_one.json"
-        );
+                       /// LOADING MY TILES
+                       this.load.image(
+                           "background",
+                           "assets/tilemaps/urban_night_black.png"
+                       ); // I dont think I need this
+                       this.load.image(
+                           "obstacle",
+                           "assets/tilemaps/toxic_water.png"
+                       ); // the cactuses are also obstacle / just hide the same object behind?
+                       this.load.image("water", "assets/tilemaps/water.png");
+                       this.load.image(
+                           "tiles",
+                           "assets/tilemaps/corona_tiles.png"
+                       );
+                       this.load.tilemapTiledJSON(
+                           "map",
+                           "assets/tilemaps/level_one.json"
+                       );
 
-        // also add every element so phaser can render it
+                       // also add every element so phaser can render it
 
-        // moving platform
-        this.load.image("block", "assets/platform.png");
+                       // moving platform
+                       this.load.image("block", "assets/platform.png");
 
+                       /////////// SOUNDS
+                       // sound effects
+                       //this.load.audio('bg', [this.p('audio/bg.mp3'),this.p('audio/bg.ogg')]);
+                       this.load.audio("bite", ["sound/bite.wav"]);
+                       this.load.audio("cough", [
+                                                  "sound/cough.wav",
+                                              ]);
 
-    }
+                       this.load.audio("obstacle", ["sound/cough.wav"]);
+                                              this.load.audio("emergency", [
+                                                  "sound/emergency.mp3"
+                                              ]);
+                    // intro sounds
+                    // this.load.audio("intro", ["sound/intro.mp3"]); // debris 
+                    this.load.audio("game", ["sound/game.mp3"]); // abyssal
+    
+                   }
 function create() {
+                      /*
+    title = this.add.image(400, 300, "title", {
+        visibility: "hidden"
+    });
+                      ///////// set the object from background to foreground
+                  
+                      Phaser.Display.Align.In.Center(
+                          this.title,
+                          this.add.zone(
+                              window.innerWidth / 2,
+                              window.innerHeight / 2,
+                              window.innerWidth,
+                              window.innerHeight
+                          )
+                      );
 
-            // title = this.add.image(400, 300, "title");
-            ///////// set the object from background to foreground
+                      title.tweens.add({
+                          targets: title,
+                          y: 450,
+                          duration: 2000,
+                          ease: "Power2",
+                          yoyo: true,
+                          loop: -1,
+                      });
+    
+                      title.setInteractive();
 
-            const map = this.make.tilemap({ key: "map" });
-            const tileset = map.addTilesetImage("corona_tiles", "tiles"); //this must be the same name as the file inside tiled/the loaded image
-            //let obstacles = map.addTilesetImage("toxic_water", "obstacle");
+                              console.log("title", title);
 
-            ////
-            function resetPlayer() {
-                player.reset(200, 600); // postion of the player
-            };
+                              title.on(
+                                  "pointerdown",
+                                  function () {
+                                      console.log("mouse is down!");
+                                      //text.setText("Game OVER");
+                                      //this.scene.restart();
+                                      console.log("this", this);
+                                      this.scene.restart("game");
+                                      console.log("gameOver", gameOver);                                         
+                                      gameOver = false;
+                                      return;
+                                  },
+                                  this
+                              );
+                      */
 
-            map.setTileIndexCallback(294, this.resetPlayer, this); // the tile ID
+                       const map = this.make.tilemap({ key: "map" });
+                       const tileset = map.addTilesetImage(
+                           "corona_tiles",
+                           "tiles"
+    );
+                       //this must be the same name as the file inside tiled/the loaded image
+                       //let obstacles = map.addTilesetImage("toxic_water", "obstacle");
 
-            // check what exactly is platformer?
-            const backGroundPicture = map.addTilesetImage(
-                "urban_night_black",
-                "background"
-            );
+                       // check what exactly is platformer?
+                       const backGroundPicture = map.addTilesetImage(
+                           "urban_night_black",
+                           "background"
+                       );
 
-            const backgroundLayer = map.createDynamicLayer(
-                "Background",
-                backGroundPicture,
-                0,
-                0
-            );
+                       const backgroundLayer = map.createDynamicLayer(
+                           "Background",
+                           backGroundPicture,
+                           0,
+                           0
+                       );
 
-            console.log("tileset", tileset);
+                       console.log("tileset", tileset);
 
-            const platforms = map.createDynamicLayer(
-                "Platforms",
-                tileset,
-                0,
-                0
-            );
+                       const platforms = map.createDynamicLayer(
+                           "Platforms",
+                           tileset,
+                           0,
+                           0
+                       );
 
-            platforms.setCollisionByExclusion([-1]);
+                       platforms.setCollisionByExclusion([-1]);
 
-            /// add obstacels
+                       /// add obstacels
+
+                       const obstacles = map.createDynamicLayer(
+                           "Obstacles",
+                           tileset,
+                           0,
+                           0
+                       );
+
+                       obstacles.setCollisionByExclusion([-1]);
+
+                       /*
             
             obstacles = this.physics.add.group({
                 key: "obstacle",
@@ -118,8 +197,11 @@ function create() {
             const obstacleObjects = map.getObjectLayer("Toxic")["objects"]; // check this Layer name is "Toxic" and another property is objects
             console.log("obstacleObjects", obstacleObjects);
 
-            /// obstacleObjects has all the objects in it but they have no name
+                */
 
+                       /// obstacleObjects has all the objects in it but they have no name
+
+                       /*
             obstacleObjects.forEach((obstacleObject) => {
                 // Add new spikes to our sprite group, change the start y position to meet the platform
                 const obstacle = obstacles
@@ -132,156 +214,181 @@ function create() {
                 obstacle.body
                     .setSize(obstacle.width, obstacle.height - 20)
                     .setOffset(0, 20);
-                return obstacle;
             });
+            */
 
+                       //// add rotating plaforms
 
-            //// add rotating plaforms
+                       // set coliision with player Collision with Player
 
-            /*
+                       // set the boundaries of our game world
+                       this.physics.world.bounds.width = platforms.width;
+                       this.physics.world.bounds.height = platforms.height;
+
+                       // The player and its settings
+                       player = this.physics.add.sprite(100, 300, "dude");
+                       player.setBounce(0.1);
+                       player.setCollideWorldBounds(true);
+
+                       // in case I have to resize
+                       player.body.setSize(
+                           player.width - 10,
+                           player.height - 10
+                       );
+
+                       //  Our player animations, turning, walking left and walking right.
+                       this.anims.create({
+                           key: "left",
+                           frames: this.anims.generateFrameNumbers("dude", {
+                               start: 0,
+                               end: 3,
+                           }),
+                           frameRate: 12,
+                           repeat: -1,
+                       });
+
+                       this.anims.create({
+                           key: "turn",
+                           frames: [{ key: "dude", frame: 4 }],
+                           frameRate: 20,
+                       });
+
+                       this.anims.create({
+                           key: "right",
+                           frames: this.anims.generateFrameNumbers("dude", {
+                               start: 5,
+                               end: 8,
+                           }),
+                           frameRate: 12,
+                           repeat: -1,
+                       });
+
+                       //  Input Events
+                       cursors = this.input.keyboard.createCursorKeys();
+
+                       //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+                       stars = this.physics.add.group({
+                           key: "star",
+                           repeat: 4, // use to be 11
+                           setXY: { x: 12, y: 0, stepX: 70 }, // use player position
+                       });
+
+                       stars.children.iterate(function (child) {
+                           //  Give each star a slightly different bounce
+                           child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+                       });
+
+                       bombs = this.physics.add.group();
+
+                       // you have to set this after you created the object
+                       this.physics.add.collider(platforms, player);
+                       this.physics.add.collider(platforms, stars);
+                       this.physics.add.collider(platforms, bombs);
+                       this.physics.add.collider(player, obstacles);
+
+                       // why is obstacle undefined?
+
+                       //  The score
+                       scoreText = this.add.text(16, 16, "score: 0", {
+                           visibility: "visible",
+                           fontFamily: "font1",
+                           fontSize: "32px",
+                           fill: "#f111d4",
+                       });
+
+                       scoreText.setScrollFactor(0);
+
+                       /// why does score disappear?
+
+                       //  The score
+                       scoreTextLife = this.add.text(32, 32, "<3: 0", {
+                           visibility: "hidden",
+                           fontFamily: "font1",
+                           fontSize: "32px",
+                           fill: "#f111d4",
+                       });
+
+                       scoreTextLife.setScrollFactor(0);
+
+                       /// do the same with platforms and everything that colides
+
+                       //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+                       this.physics.add.overlap(
+                           player,
+                           stars,
+                           collectStar,
+                           null,
+                           this
+                       );
+
+                       this.physics.add.collider(
+                           player,
+                           bombs,
+                           hitBomb,
+                           null,
+                           this
+                       );
+
+                       
+            this.physics.add.collider(
+                player,
+                obstacles,
+                playerCough,
+                null,
+                this
+            );
+
+        
+                       /*
             Create platforms at the point locations in the "Platform Locations" layer created in Tiled
             map.getObjectLayer("Platform Locations").objects.forEach(point => {
                 createRotatingPlatform(this, point.x, point.y);
             });
             */
-        
-            // set coliision with player Collision with Player
 
-            // set the boundaries of our game world
-            this.physics.world.bounds.width = platforms.width;
-            this.physics.world.bounds.height = platforms.height;
+                       /// add some more plattform thruout the game
 
-            // The player and its settings
-            player = this.physics.add.sprite(100, 300, "dude");
-            player.setBounce(0.1);
-            player.setCollideWorldBounds(true);
+                       let block = this.physics.add
+                           .image(100, 320, "block")
+                           .setImmovable(true)
+                           .setVelocity(100, -100);
 
-            // in case I have to resize
-            player.body.setSize(player.width - 10, player.height - 18);
+                       block.body.setAllowGravity(false);
 
-            //  Our player animations, turning, walking left and walking right.
-            this.anims.create({
-                key: "left",
-                frames: this.anims.generateFrameNumbers("dude", {
-                    start: 0,
-                    end: 3,
-                }),
-                frameRate: 12,
-                repeat: -1,
-            });
+                       this.physics.add.collider(block, player);
 
-            this.anims.create({
-                key: "turn",
-                frames: [{ key: "dude", frame: 4 }],
-                frameRate: 20,
-            });
+                       this.physics.add.collider(block, platforms);
 
-            this.anims.create({
-                key: "right",
-                frames: this.anims.generateFrameNumbers("dude", {
-                    start: 5,
-                    end: 8,
-                }),
-                frameRate: 12,
-                repeat: -1,
-            });
+                       // set bounds so the camera won't go outside the game world
+                       this.cameras.main.setBounds(
+                           0,
+                           0,
+                           map.widthInPixels,
+                           map.heightInPixels
+                       );
+                       // make the camera follow the player
+                       this.cameras.main.startFollow(player);
 
-            //  Input Events
-            cursors = this.input.keyboard.createCursorKeys();
+                       // set background color, so the sky is not black
+                       //this.cameras.main.setBackgroundColor('#ccccff');
 
-            //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-            stars = this.physics.add.group({
-                key: "star",
-                repeat: 0, // use to be 11
-                setXY: { x: 12, y: 0, stepX: 70 },
-            });
+                       /// SOUNDS
 
-            stars.children.iterate(function (child) {
-                //  Give each star a slightly different bounce
-                child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-            });
+                       // sound effects
+                       soundbite = this.sound.add("bite");
+                       soundcough = this.sound.add("cough");
+    soundobstacle = this.sound.add("cough"); // for testing
+    soundemergency = this.sound.add("emergency");
+    soundgame = this.sound.add("game");
+    soundgame.play();
 
-            bombs = this.physics.add.group();
-
-            // you have to set this after you created the object
-            this.physics.add.collider(platforms, player);
-            this.physics.add.collider(platforms, stars);
-            this.physics.add.collider(platforms, bombs);
-
-            // why is obstacle undefined?
-         
-            //  The score 
-    scoreText = this.add.text(16, 16, "score: 0", {
-        visibility: "visible",
-        fontFamily: "font1",
-                fontSize: "32px",
-                fill: "#f111d4",
-            });
-
-            scoreText.setScrollFactor(0);
-
-            /// why does score disappear?
-
-             //  The score
-            scoreTextLife = this.add.text(32, 32, "<3: 0", {
-                visibility: "hidden",
-                fontFamily: "font1",
-                fontSize: "32px",
-                fill: "#f111d4",
-            });
-
-            scoreTextLife.setScrollFactor(0);
-
-            /// do the same with platforms and everything that colides
-
-            //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-            this.physics.add.overlap(player, stars, collectStar, null, this);
-
-            this.physics.add.collider(player, bombs, hitBomb, null, this);
-
-    // obstacle is undefined :(
-            /*
-            this.physics.add.collider(
-                obstacle,
-                player,
-                playerCollide,
-                null,
-                this
-            );
-            */
-    
-
-    /// add some more plattform thruout the game
-    
-            let block = this.physics.add
-                .image(100, 320, "block")
-                .setImmovable(true)
-                .setVelocity(100, -100);
-
-            block.body.setAllowGravity(false);
-
-            
-            this.physics.add.collider(block, player);
-
-            this.physics.add.collider(block, platforms);
-    
-
-            // set bounds so the camera won't go outside the game world
-            this.cameras.main.setBounds(
-                0,
-                0,
-                map.widthInPixels,
-                map.heightInPixels
-            );
-            // make the camera follow the player
-            this.cameras.main.startFollow(player);
-
-            // set background color, so the sky is not black
-            //this.cameras.main.setBackgroundColor('#ccccff');
-        }
+                       //this.sfxbomb = this.sound.add("bomb");
+                   }
         
 
         function update() {
+
+
             if (gameOver) {
                 return;
             }
@@ -303,8 +410,8 @@ function create() {
                 (cursors.space.isDown || cursors.up.isDown) &&
                 player.body.onFloor()
             ) {
-                player.setVelocityY(-280);
-                player.setGravityY(150);
+                player.setVelocityY(-350);
+                player.setGravityY(200);
             }
 
             //// add a score for extra Life OKK
@@ -327,7 +434,9 @@ function create() {
         // add hearts and big pizza pieces and make a life score 
 
 
-        function collectStar(player, star) {
+function collectStar(player, star) {
+			soundbite.play();
+
             star.disableBody(true, true);
 
             //  Add and update the score
@@ -368,7 +477,12 @@ function playerCollide(player, obstacle) {
 }
 */
 
+function playerCough(player, obstacles){
+        soundcough.play();
+}
+
 function hitBomb(player, bomb) {
+    soundcough.play();
 
     console.log("life", life);
             
@@ -397,7 +511,8 @@ function hitBomb(player, bomb) {
           
             // add a game over screen
 
-            if (gameOver) {
+    if (gameOver) {
+        soundemergency.play();
                               this.physics.pause(); // apparently stays pause when restarted
 
                               let gameoverscreen = this.physics.add.image(
@@ -420,6 +535,9 @@ function hitBomb(player, bomb) {
                                       this.scene.restart("game");
                                       console.log("gameOver", gameOver);                                         
                                       gameOver = false;
+                                      soundemergency.stop();
+                                      soundgame.stop();
+
                                       return;
                                   },
                                   this
@@ -444,6 +562,16 @@ function hitBomb(player, bomb) {
 }
 
 
+            //// reset player
+            /*
+function resetPlayer(player, obstacles) {
+    player.setTint(0x7cc233);
+    console.log("resetPlayer running");
+    console.log("obstacles", obstacles);
+    this.physics.pause(); 
+            // player.reset(200, 600); // postion of the player
+            };
+*/
 
 /*
 function startScreen() {
